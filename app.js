@@ -224,6 +224,32 @@ function updateInfoCard() {
   titleElement.textContent = activeObject.name;
   summaryElement.textContent = activeObject.summary;
   infoCard.hidden = false;
+  positionInfoCard(infoCard, activeObject);
+}
+
+function positionInfoCard(infoCard, activeObject) {
+  const muralFrame = document.querySelector("#muralFrame");
+
+  if (!muralFrame || !activeObject.cardPosition) {
+    return;
+  }
+
+  const frameRect = muralFrame.getBoundingClientRect();
+  const cardRect = infoCard.getBoundingClientRect();
+  const safeGap = 16;
+  const rawLeft = activeObject.cardPosition[0] * frameRect.width;
+  const rawTop = activeObject.cardPosition[1] * frameRect.height;
+  const maxLeft = Math.max(safeGap, frameRect.width - cardRect.width - safeGap);
+  const maxTop = Math.max(safeGap, frameRect.height - cardRect.height - safeGap);
+  const left = clamp(rawLeft, safeGap, maxLeft);
+  const top = clamp(rawTop, safeGap, maxTop);
+
+  infoCard.style.left = `${left}px`;
+  infoCard.style.top = `${top}px`;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function bindPolygonTooltip(polygonElement, objectItem) {
