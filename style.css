@@ -89,7 +89,8 @@ body {
   stroke: rgba(255, 205, 97, 0);
   stroke-width: 2;
   cursor: pointer;
-  transition: fill 160ms ease, stroke 160ms ease, filter 160ms ease;
+  transition: fill 160ms ease, stroke 160ms ease, filter 160ms ease, transform 180ms ease;
+  transform-box: fill-box;
 }
 
 .object-polygon.is-debug-visible {
@@ -113,9 +114,11 @@ body {
   fill: rgba(255, 222, 142, 0.32);
   stroke: rgba(255, 247, 216, 1);
   stroke-width: 3;
+  transform: scale(1.05);
   filter:
     drop-shadow(0 0 5px rgba(255, 231, 160, 0.82))
-    drop-shadow(0 0 14px rgba(255, 190, 82, 0.42));
+    drop-shadow(0 0 14px rgba(255, 190, 82, 0.42))
+    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.32));
 }
 
 .object-tooltip {

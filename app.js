@@ -127,6 +127,7 @@ function renderObjectPolygons() {
     polygonElement.setAttribute("points", points);
     polygonElement.setAttribute("data-object-id", objectItem.id);
     polygonElement.setAttribute("aria-label", objectItem.name);
+    setPolygonTransformOrigin(polygonElement, objectItem, overlayWidth, overlayHeight);
     polygonElement.classList.add("object-polygon");
     bindPolygonTooltip(polygonElement, objectItem);
     bindPolygonActiveState(polygonElement, objectItem);
@@ -137,6 +138,22 @@ function renderObjectPolygons() {
 
     polygonOverlay.appendChild(polygonElement);
   });
+}
+
+function setPolygonTransformOrigin(polygonElement, objectItem, overlayWidth, overlayHeight) {
+  const center = objectItem.polygon.reduce(
+    function (result, point) {
+      result.x += point[0] * overlayWidth;
+      result.y += point[1] * overlayHeight;
+      return result;
+    },
+    { x: 0, y: 0 }
+  );
+
+  center.x = center.x / objectItem.polygon.length;
+  center.y = center.y / objectItem.polygon.length;
+
+  polygonElement.style.transformOrigin = `${center.x}px ${center.y}px`;
 }
 
 function bindPolygonActiveState(polygonElement, objectItem) {
