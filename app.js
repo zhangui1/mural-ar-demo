@@ -219,6 +219,7 @@ function updateInfoCard() {
   if (!activeObject) {
     infoCard.hidden = true;
     removeAnchorDebugPoint();
+    removeConnectorLine();
     return;
   }
 
@@ -229,6 +230,7 @@ function updateInfoCard() {
   positionInfoCard(infoCard, activeObject);
   updateInfoCardAttachPoint(infoCard, activeObject);
   updateAnchorDebugPoint(activeObject);
+  updateConnectorLine(activeObject);
 }
 
 function getObjectAnchorPoint(activeObject) {
@@ -342,6 +344,41 @@ function updateInfoCardAttachPoint(infoCard, activeObject) {
 
   infoCard.dataset.attachX = attachPoint.x;
   infoCard.dataset.attachY = attachPoint.y;
+}
+
+function updateConnectorLine(activeObject) {
+  const polygonOverlay = document.querySelector("#polygonOverlay");
+  const infoCard = document.querySelector("#infoCard");
+  const anchorPoint = getObjectAnchorPoint(activeObject);
+
+  removeConnectorLine();
+
+  if (!polygonOverlay || !infoCard || !anchorPoint || infoCard.hidden) {
+    return;
+  }
+
+  const attachPoint = {
+    x: Number(infoCard.dataset.attachX),
+    y: Number(infoCard.dataset.attachY)
+  };
+
+  if (!attachPoint.x || !attachPoint.y) {
+    return;
+  }
+
+  const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  lineElement.setAttribute("x1", anchorPoint.x);
+  lineElement.setAttribute("y1", anchorPoint.y);
+  lineElement.setAttribute("x2", attachPoint.x);
+  lineElement.setAttribute("y2", attachPoint.y);
+  lineElement.classList.add("connector-line");
+  polygonOverlay.appendChild(lineElement);
+}
+
+function removeConnectorLine() {
+  document.querySelectorAll(".connector-line").forEach(function (lineElement) {
+    lineElement.remove();
+  });
 }
 
 function clamp(value, min, max) {
