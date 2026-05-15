@@ -121,6 +121,13 @@ body {
     drop-shadow(0 12px 18px rgba(0, 0, 0, 0.32));
 }
 
+.anchor-debug-point {
+  fill: #7ee7ff;
+  stroke: rgba(10, 35, 40, 0.9);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
 .object-tooltip {
   position: absolute;
   z-index: 3;

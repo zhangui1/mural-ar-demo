@@ -2,6 +2,7 @@ let muralData = null;
 let objectData = [];
 let activeObjectId = null;
 const DEBUG_POLYGON = true;
+const DEBUG_ANCHOR = true;
 const MURAL_IMAGE_CANDIDATES = [
   "assets/murals/mural_001.jpg",
   "assets/murals/mural_001.png"
@@ -217,6 +218,7 @@ function updateInfoCard() {
 
   if (!activeObject) {
     infoCard.hidden = true;
+    removeAnchorDebugPoint();
     return;
   }
 
@@ -225,6 +227,57 @@ function updateInfoCard() {
   summaryElement.textContent = activeObject.summary;
   infoCard.hidden = false;
   positionInfoCard(infoCard, activeObject);
+  updateAnchorDebugPoint(activeObject);
+}
+
+function getObjectAnchorPoint(activeObject) {
+  const polygonOverlay = document.querySelector("#polygonOverlay");
+
+  if (!polygonOverlay || !activeObject.anchor) {
+    return null;
+  }
+
+  const overlayWidth = Number(polygonOverlay.getAttribute("width"));
+  const overlayHeight = Number(polygonOverlay.getAttribute("height"));
+
+  if (!overlayWidth || !overlayHeight) {
+    return null;
+  }
+
+  return {
+    x: activeObject.anchor[0] * overlayWidth,
+    y: activeObject.anchor[1] * overlayHeight
+  };
+}
+
+function updateAnchorDebugPoint(activeObject) {
+  const polygonOverlay = document.querySelector("#polygonOverlay");
+  const anchorPoint = getObjectAnchorPoint(activeObject);
+
+  if (!polygonOverlay || !anchorPoint) {
+    return;
+  }
+
+  removeAnchorDebugPoint();
+
+  if (!DEBUG_ANCHOR) {
+    return;
+  }
+
+  const anchorElement = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  anchorElement.setAttribute("cx", anchorPoint.x);
+  anchorElement.setAttribute("cy", anchorPoint.y);
+  anchorElement.setAttribute("r", 5);
+  anchorElement.classList.add("anchor-debug-point");
+  polygonOverlay.appendChild(anchorElement);
+}
+
+function removeAnchorDebugPoint() {
+  const anchorElement = document.querySelector(".anchor-debug-point");
+
+  if (anchorElement) {
+    anchorElement.remove();
+  }
 }
 
 function positionInfoCard(infoCard, activeObject) {
