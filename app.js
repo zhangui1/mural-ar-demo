@@ -125,7 +125,9 @@ function renderObjectPolygons() {
 
     polygonElement.setAttribute("points", points);
     polygonElement.setAttribute("data-object-id", objectItem.id);
+    polygonElement.setAttribute("aria-label", objectItem.name);
     polygonElement.classList.add("object-polygon");
+    bindPolygonTooltip(polygonElement, objectItem);
 
     if (DEBUG_POLYGON) {
       polygonElement.classList.add("is-debug-visible");
@@ -133,6 +135,56 @@ function renderObjectPolygons() {
 
     polygonOverlay.appendChild(polygonElement);
   });
+}
+
+function bindPolygonTooltip(polygonElement, objectItem) {
+  polygonElement.addEventListener("mouseenter", function (event) {
+    showObjectTooltip(objectItem.name, event);
+  });
+
+  polygonElement.addEventListener("mousemove", function (event) {
+    moveObjectTooltip(event);
+  });
+
+  polygonElement.addEventListener("mouseleave", hideObjectTooltip);
+}
+
+function showObjectTooltip(objectName, event) {
+  const tooltip = document.querySelector("#objectTooltip");
+
+  if (!tooltip) {
+    return;
+  }
+
+  tooltip.textContent = objectName;
+  tooltip.hidden = false;
+  moveObjectTooltip(event);
+}
+
+function moveObjectTooltip(event) {
+  const muralFrame = document.querySelector("#muralFrame");
+  const tooltip = document.querySelector("#objectTooltip");
+
+  if (!muralFrame || !tooltip || tooltip.hidden) {
+    return;
+  }
+
+  const frameRect = muralFrame.getBoundingClientRect();
+  const tooltipX = event.clientX - frameRect.left;
+  const tooltipY = event.clientY - frameRect.top;
+
+  tooltip.style.left = `${tooltipX}px`;
+  tooltip.style.top = `${tooltipY}px`;
+}
+
+function hideObjectTooltip() {
+  const tooltip = document.querySelector("#objectTooltip");
+
+  if (!tooltip) {
+    return;
+  }
+
+  tooltip.hidden = true;
 }
 
 window.addEventListener("resize", updateOverlaySize);
