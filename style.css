@@ -89,6 +89,11 @@ body {
   filter: drop-shadow(0 0 6px rgba(255, 218, 120, 0.48));
 }
 
+.object-polygon.is-active {
+  fill: rgba(255, 218, 120, 0.26);
+  stroke: rgba(255, 238, 190, 0.98);
+}
+
 .object-tooltip {
   position: absolute;
   z-index: 3;

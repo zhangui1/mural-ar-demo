@@ -1,5 +1,6 @@
 let muralData = null;
 let objectData = [];
+let activeObjectId = null;
 const DEBUG_POLYGON = true;
 const MURAL_IMAGE_CANDIDATES = [
   "assets/murals/mural_001.jpg",
@@ -128,12 +129,35 @@ function renderObjectPolygons() {
     polygonElement.setAttribute("aria-label", objectItem.name);
     polygonElement.classList.add("object-polygon");
     bindPolygonTooltip(polygonElement, objectItem);
+    bindPolygonActiveState(polygonElement, objectItem);
 
     if (DEBUG_POLYGON) {
       polygonElement.classList.add("is-debug-visible");
     }
 
     polygonOverlay.appendChild(polygonElement);
+  });
+}
+
+function bindPolygonActiveState(polygonElement, objectItem) {
+  polygonElement.addEventListener("click", function (event) {
+    event.stopPropagation();
+    setActiveObject(objectItem.id);
+  });
+}
+
+function setActiveObject(objectId) {
+  activeObjectId = objectId;
+  updateActivePolygonClass();
+  console.log("Active object:", activeObjectId);
+}
+
+function updateActivePolygonClass() {
+  const polygonElements = document.querySelectorAll(".object-polygon");
+
+  polygonElements.forEach(function (polygonElement) {
+    const isActive = polygonElement.dataset.objectId === activeObjectId;
+    polygonElement.classList.toggle("is-active", isActive);
   });
 }
 
