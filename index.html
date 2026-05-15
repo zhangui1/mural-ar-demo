@@ -14,13 +14,18 @@
     </header>
 
     <section class="mural-stage" aria-label="壁画展示区域">
-      <div class="mural-frame">
+      <div id="muralFrame" class="mural-frame">
         <img
           id="muralImage"
           src="assets/murals/mural_001.jpg"
           alt="文物壁画"
           hidden
         >
+        <svg
+          id="polygonOverlay"
+          class="polygon-overlay"
+          aria-hidden="true"
+        ></svg>
         <div id="muralMissingMessage" class="mural-placeholder">
           请将壁画图片命名为 mural_001.jpg 并放入 assets/murals/ 目录。
         </div>

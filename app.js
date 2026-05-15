@@ -44,12 +44,35 @@ function showMuralImageWhenAvailable() {
   muralImage.addEventListener("load", function () {
     muralImage.hidden = false;
     missingMessage.hidden = true;
+    updateOverlaySize();
   });
 
   muralImage.addEventListener("error", function () {
     muralImage.hidden = true;
     missingMessage.hidden = false;
+    updateOverlaySize();
   });
+
+  if (muralImage.complete) {
+    muralImage.hidden = muralImage.naturalWidth === 0;
+    missingMessage.hidden = muralImage.naturalWidth > 0;
+    updateOverlaySize();
+  }
 }
 
+function updateOverlaySize() {
+  const muralFrame = document.querySelector("#muralFrame");
+  const polygonOverlay = document.querySelector("#polygonOverlay");
+
+  if (!muralFrame || !polygonOverlay) {
+    return;
+  }
+
+  const frameRect = muralFrame.getBoundingClientRect();
+  polygonOverlay.setAttribute("viewBox", `0 0 ${frameRect.width} ${frameRect.height}`);
+  polygonOverlay.setAttribute("width", frameRect.width);
+  polygonOverlay.setAttribute("height", frameRect.height);
+}
+
+window.addEventListener("resize", updateOverlaySize);
 document.addEventListener("DOMContentLoaded", initializeApp);
