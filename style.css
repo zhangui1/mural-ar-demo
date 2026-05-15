@@ -70,6 +70,17 @@ body {
   pointer-events: none;
 }
 
+.object-polygon {
+  fill: rgba(255, 205, 97, 0);
+  stroke: rgba(255, 205, 97, 0);
+  stroke-width: 2;
+}
+
+.object-polygon.is-debug-visible {
+  fill: rgba(255, 205, 97, 0.18);
+  stroke: rgba(255, 205, 97, 0.75);
+}
+
 .mural-placeholder {
   padding: 24px;
   color: #d8cdb8;
