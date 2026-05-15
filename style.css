@@ -150,6 +150,7 @@ body {
   color: #fff8e8;
   background: rgba(29, 24, 17, 0.92);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  animation: infoCardPop 220ms ease-out;
 }
 
 .info-card__category {
@@ -169,6 +170,18 @@ body {
   color: #eadfca;
   font-size: 14px;
   line-height: 1.7;
+}
+
+@keyframes infoCardPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .mural-placeholder {
