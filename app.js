@@ -304,8 +304,13 @@ function hideObjectTooltip() {
 
 document.addEventListener("click", function (event) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
+  const infoCard = document.querySelector("#infoCard");
 
-  if (!polygonOverlay || polygonOverlay.contains(event.target)) {
+  if (
+    !polygonOverlay ||
+    polygonOverlay.contains(event.target) ||
+    (infoCard && infoCard.contains(event.target))
+  ) {
     return;
   }
 
