@@ -1,6 +1,10 @@
 let muralData = null;
 let objectData = [];
 const DEBUG_POLYGON = true;
+const MURAL_IMAGE_CANDIDATES = [
+  "assets/murals/mural_001.jpg",
+  "assets/murals/mural_001.png"
+];
 
 async function initializeApp() {
   console.log("Mural AR Demo initialized.");
@@ -38,6 +42,7 @@ function updateMuralTitle(mural) {
 function showMuralImageWhenAvailable() {
   const muralImage = document.querySelector("#muralImage");
   const missingMessage = document.querySelector("#muralMissingMessage");
+  let currentImageIndex = 0;
 
   if (!muralImage || !missingMessage) {
     return;
@@ -50,16 +55,31 @@ function showMuralImageWhenAvailable() {
   });
 
   muralImage.addEventListener("error", function () {
-    muralImage.hidden = true;
-    missingMessage.hidden = false;
-    updateOverlaySize();
+    currentImageIndex += 1;
+
+    if (currentImageIndex < MURAL_IMAGE_CANDIDATES.length) {
+      muralImage.src = MURAL_IMAGE_CANDIDATES[currentImageIndex];
+      return;
+    }
+
+    showMissingMuralMessage(muralImage, missingMessage);
   });
 
   if (muralImage.complete) {
-    muralImage.hidden = muralImage.naturalWidth === 0;
-    missingMessage.hidden = muralImage.naturalWidth > 0;
-    updateOverlaySize();
+    if (muralImage.naturalWidth === 0) {
+      muralImage.src = MURAL_IMAGE_CANDIDATES[currentImageIndex];
+    } else {
+      muralImage.hidden = false;
+      missingMessage.hidden = true;
+      updateOverlaySize();
+    }
   }
+}
+
+function showMissingMuralMessage(muralImage, missingMessage) {
+  muralImage.hidden = true;
+  missingMessage.hidden = false;
+  updateOverlaySize();
 }
 
 function updateOverlaySize() {
