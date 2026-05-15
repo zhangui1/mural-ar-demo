@@ -155,14 +155,20 @@ function setActiveObject(objectId) {
 function updateActivePolygonClass() {
   const polygonElements = document.querySelectorAll(".object-polygon");
   const dimLayer = document.querySelector("#focusDimLayer");
+  const muralFrame = document.querySelector("#muralFrame");
 
   polygonElements.forEach(function (polygonElement) {
     const isActive = polygonElement.dataset.objectId === activeObjectId;
     polygonElement.classList.toggle("is-active", isActive);
+    polygonElement.classList.toggle("is-muted", Boolean(activeObjectId) && !isActive);
   });
 
   if (dimLayer) {
     dimLayer.hidden = !activeObjectId;
+  }
+
+  if (muralFrame) {
+    muralFrame.classList.toggle("is-focus-mode", Boolean(activeObjectId));
   }
 }
 
