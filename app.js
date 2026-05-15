@@ -227,6 +227,7 @@ function updateInfoCard() {
   summaryElement.textContent = activeObject.summary;
   infoCard.hidden = false;
   positionInfoCard(infoCard, activeObject);
+  updateInfoCardAttachPoint(infoCard, activeObject);
   updateAnchorDebugPoint(activeObject);
 }
 
@@ -299,6 +300,48 @@ function positionInfoCard(infoCard, activeObject) {
 
   infoCard.style.left = `${left}px`;
   infoCard.style.top = `${top}px`;
+}
+
+function getInfoCardAttachPoint(infoCard, activeObject) {
+  const muralFrame = document.querySelector("#muralFrame");
+  const anchorPoint = getObjectAnchorPoint(activeObject);
+
+  if (!muralFrame || !anchorPoint) {
+    return null;
+  }
+
+  const frameRect = muralFrame.getBoundingClientRect();
+  const cardRect = infoCard.getBoundingClientRect();
+  const cardLeft = cardRect.left - frameRect.left;
+  const cardTop = cardRect.top - frameRect.top;
+  const cardWidth = cardRect.width;
+  const cardHeight = cardRect.height;
+  const cardCenterX = cardLeft + cardWidth / 2;
+  const cardCenterY = cardTop + cardHeight / 2;
+  const connectFromHorizontalSide = Math.abs(anchorPoint.x - cardCenterX) > Math.abs(anchorPoint.y - cardCenterY);
+
+  if (connectFromHorizontalSide) {
+    return {
+      x: anchorPoint.x < cardCenterX ? cardLeft : cardLeft + cardWidth,
+      y: clamp(anchorPoint.y, cardTop + 12, cardTop + cardHeight - 12)
+    };
+  }
+
+  return {
+    x: clamp(anchorPoint.x, cardLeft + 12, cardLeft + cardWidth - 12),
+    y: anchorPoint.y < cardCenterY ? cardTop : cardTop + cardHeight
+  };
+}
+
+function updateInfoCardAttachPoint(infoCard, activeObject) {
+  const attachPoint = getInfoCardAttachPoint(infoCard, activeObject);
+
+  if (!attachPoint) {
+    return;
+  }
+
+  infoCard.dataset.attachX = attachPoint.x;
+  infoCard.dataset.attachY = attachPoint.y;
 }
 
 function clamp(value, min, max) {
