@@ -375,12 +375,14 @@ function updateConnectorLine(activeObject) {
   beamElement.setAttribute("y1", anchorPoint.y);
   beamElement.setAttribute("x2", attachPoint.x);
   beamElement.setAttribute("y2", attachPoint.y);
+  beamElement.style.setProperty("--beam-length", getLineLength(anchorPoint, attachPoint));
   beamElement.classList.add("connector-beam");
 
   lineElement.setAttribute("x1", anchorPoint.x);
   lineElement.setAttribute("y1", anchorPoint.y);
   lineElement.setAttribute("x2", attachPoint.x);
   lineElement.setAttribute("y2", attachPoint.y);
+  lineElement.style.setProperty("--beam-length", getLineLength(anchorPoint, attachPoint));
   lineElement.classList.add("connector-line");
 
   anchorGlow.setAttribute("cx", anchorPoint.x);
@@ -397,6 +399,12 @@ function updateConnectorLine(activeObject) {
   polygonOverlay.appendChild(lineElement);
   polygonOverlay.appendChild(anchorGlow);
   polygonOverlay.appendChild(cardGlow);
+}
+
+function getLineLength(startPoint, endPoint) {
+  const deltaX = endPoint.x - startPoint.x;
+  const deltaY = endPoint.y - startPoint.y;
+  return `${Math.sqrt(deltaX * deltaX + deltaY * deltaY)}px`;
 }
 
 function removeConnectorLine() {
