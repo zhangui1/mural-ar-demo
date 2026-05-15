@@ -104,12 +104,18 @@ body {
 }
 
 .object-polygon.is-muted {
+  fill: rgba(255, 205, 97, 0.07);
+  stroke: rgba(255, 205, 97, 0.2);
   filter: blur(4px);
 }
 
 .object-polygon.is-active {
-  fill: rgba(255, 218, 120, 0.26);
-  stroke: rgba(255, 238, 190, 0.98);
+  fill: rgba(255, 222, 142, 0.32);
+  stroke: rgba(255, 247, 216, 1);
+  stroke-width: 3;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 231, 160, 0.82))
+    drop-shadow(0 0 14px rgba(255, 190, 82, 0.42));
 }
 
 .object-tooltip {
