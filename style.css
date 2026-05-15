@@ -68,6 +68,15 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: auto;
+  z-index: 2;
+}
+
+.focus-dim-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.34);
+  pointer-events: none;
 }
 
 .object-polygon {
@@ -112,6 +121,8 @@ body {
 }
 
 .mural-placeholder {
+  position: relative;
+  z-index: 2;
   padding: 24px;
   color: #d8cdb8;
   text-align: center;

@@ -154,11 +154,16 @@ function setActiveObject(objectId) {
 
 function updateActivePolygonClass() {
   const polygonElements = document.querySelectorAll(".object-polygon");
+  const dimLayer = document.querySelector("#focusDimLayer");
 
   polygonElements.forEach(function (polygonElement) {
     const isActive = polygonElement.dataset.objectId === activeObjectId;
     polygonElement.classList.toggle("is-active", isActive);
   });
+
+  if (dimLayer) {
+    dimLayer.hidden = !activeObjectId;
+  }
 }
 
 function bindPolygonTooltip(polygonElement, objectItem) {
