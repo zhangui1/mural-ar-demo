@@ -138,6 +138,39 @@ body {
   white-space: nowrap;
 }
 
+.info-card {
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  z-index: 4;
+  width: min(300px, calc(100% - 40px));
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 232, 170, 0.38);
+  border-radius: 8px;
+  color: #fff8e8;
+  background: rgba(29, 24, 17, 0.92);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+}
+
+.info-card__category {
+  margin: 0 0 8px;
+  color: #e6c56c;
+  font-size: 13px;
+}
+
+.info-card__title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.info-card__summary {
+  margin: 0;
+  color: #eadfca;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
 .mural-placeholder {
   position: relative;
   z-index: 2;

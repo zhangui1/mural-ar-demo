@@ -166,6 +166,7 @@ function bindPolygonActiveState(polygonElement, objectItem) {
 function setActiveObject(objectId) {
   activeObjectId = objectId;
   updateActivePolygonClass();
+  updateInfoCard();
   console.log("Active object:", activeObjectId);
 }
 
@@ -176,6 +177,7 @@ function clearActiveObject() {
 
   activeObjectId = null;
   updateActivePolygonClass();
+  updateInfoCard();
   hideObjectTooltip();
   console.log("Active object cleared.");
 }
@@ -198,6 +200,30 @@ function updateActivePolygonClass() {
   if (muralFrame) {
     muralFrame.classList.toggle("is-focus-mode", Boolean(activeObjectId));
   }
+}
+
+function updateInfoCard() {
+  const infoCard = document.querySelector("#infoCard");
+  const categoryElement = document.querySelector("#infoCardCategory");
+  const titleElement = document.querySelector("#infoCardTitle");
+  const summaryElement = document.querySelector("#infoCardSummary");
+  const activeObject = objectData.find(function (objectItem) {
+    return objectItem.id === activeObjectId;
+  });
+
+  if (!infoCard || !categoryElement || !titleElement || !summaryElement) {
+    return;
+  }
+
+  if (!activeObject) {
+    infoCard.hidden = true;
+    return;
+  }
+
+  categoryElement.textContent = activeObject.category;
+  titleElement.textContent = activeObject.name;
+  summaryElement.textContent = activeObject.summary;
+  infoCard.hidden = false;
 }
 
 function bindPolygonTooltip(polygonElement, objectItem) {
