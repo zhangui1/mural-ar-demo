@@ -169,6 +169,17 @@ function setActiveObject(objectId) {
   console.log("Active object:", activeObjectId);
 }
 
+function clearActiveObject() {
+  if (!activeObjectId) {
+    return;
+  }
+
+  activeObjectId = null;
+  updateActivePolygonClass();
+  hideObjectTooltip();
+  console.log("Active object cleared.");
+}
+
 function updateActivePolygonClass() {
   const polygonElements = document.querySelectorAll(".object-polygon");
   const dimLayer = document.querySelector("#focusDimLayer");
@@ -238,6 +249,22 @@ function hideObjectTooltip() {
 
   tooltip.hidden = true;
 }
+
+document.addEventListener("click", function (event) {
+  const polygonOverlay = document.querySelector("#polygonOverlay");
+
+  if (!polygonOverlay || polygonOverlay.contains(event.target)) {
+    return;
+  }
+
+  clearActiveObject();
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    clearActiveObject();
+  }
+});
 
 window.addEventListener("resize", updateOverlaySize);
 document.addEventListener("DOMContentLoaded", initializeApp);
