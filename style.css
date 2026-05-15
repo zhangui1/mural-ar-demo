@@ -133,6 +133,27 @@ body {
   stroke-width: 2;
   stroke-linecap: round;
   pointer-events: none;
+  filter: drop-shadow(0 0 7px rgba(255, 220, 130, 0.55));
+}
+
+.connector-beam {
+  stroke: rgba(255, 210, 105, 0.18);
+  stroke-width: 12;
+  stroke-linecap: round;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(255, 210, 105, 0.3));
+}
+
+.connector-glow-dot {
+  fill: rgba(255, 239, 190, 0.95);
+  pointer-events: none;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 226, 140, 0.82))
+    drop-shadow(0 0 14px rgba(255, 190, 82, 0.35));
+}
+
+.connector-glow-dot--small {
+  fill: rgba(255, 220, 136, 0.86);
 }
 
 .object-tooltip {

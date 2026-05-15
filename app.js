@@ -367,17 +367,41 @@ function updateConnectorLine(activeObject) {
   }
 
   const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const beamElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const anchorGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  const cardGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+  beamElement.setAttribute("x1", anchorPoint.x);
+  beamElement.setAttribute("y1", anchorPoint.y);
+  beamElement.setAttribute("x2", attachPoint.x);
+  beamElement.setAttribute("y2", attachPoint.y);
+  beamElement.classList.add("connector-beam");
+
   lineElement.setAttribute("x1", anchorPoint.x);
   lineElement.setAttribute("y1", anchorPoint.y);
   lineElement.setAttribute("x2", attachPoint.x);
   lineElement.setAttribute("y2", attachPoint.y);
   lineElement.classList.add("connector-line");
+
+  anchorGlow.setAttribute("cx", anchorPoint.x);
+  anchorGlow.setAttribute("cy", anchorPoint.y);
+  anchorGlow.setAttribute("r", 5);
+  anchorGlow.classList.add("connector-glow-dot");
+
+  cardGlow.setAttribute("cx", attachPoint.x);
+  cardGlow.setAttribute("cy", attachPoint.y);
+  cardGlow.setAttribute("r", 4);
+  cardGlow.classList.add("connector-glow-dot", "connector-glow-dot--small");
+
+  polygonOverlay.appendChild(beamElement);
   polygonOverlay.appendChild(lineElement);
+  polygonOverlay.appendChild(anchorGlow);
+  polygonOverlay.appendChild(cardGlow);
 }
 
 function removeConnectorLine() {
-  document.querySelectorAll(".connector-line").forEach(function (lineElement) {
-    lineElement.remove();
+  document.querySelectorAll(".connector-line, .connector-beam, .connector-glow-dot").forEach(function (element) {
+    element.remove();
   });
 }
 
