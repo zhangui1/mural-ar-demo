@@ -366,7 +366,6 @@ function updateConnectorLine(activeObject) {
   const gradientId = `connector-gradient-${activeObject.id}`;
   const gradientElement = createBeamGradient(gradientId, anchorPoint, beamPoints.center);
   const beamCone = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-  const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
   const topEdgeLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
   const bottomEdgeLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
   const anchorGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -378,13 +377,6 @@ function updateConnectorLine(activeObject) {
   );
   beamCone.setAttribute("fill", `url(#${gradientId})`);
   beamCone.classList.add("connector-light-cone");
-
-  lineElement.setAttribute("x1", anchorPoint.x);
-  lineElement.setAttribute("y1", anchorPoint.y);
-  lineElement.setAttribute("x2", beamPoints.center.x);
-  lineElement.setAttribute("y2", beamPoints.center.y);
-  lineElement.style.setProperty("--beam-length", getLineLength(anchorPoint, beamPoints.center));
-  lineElement.classList.add("connector-line");
 
   setLinePosition(topEdgeLine, anchorPoint, beamPoints.top);
   topEdgeLine.style.setProperty("--beam-length", getLineLength(anchorPoint, beamPoints.top));
@@ -408,8 +400,7 @@ function updateConnectorLine(activeObject) {
   polygonOverlay.appendChild(beamCone);
   polygonOverlay.appendChild(topEdgeLine);
   polygonOverlay.appendChild(bottomEdgeLine);
-  polygonOverlay.appendChild(lineElement);
-  createBeamParticles(polygonOverlay, anchorPoint, beamPoints.center);
+  createBeamParticles(polygonOverlay, anchorPoint, beamPoints);
   polygonOverlay.appendChild(anchorGlow);
   polygonOverlay.appendChild(cardGlow);
 }
@@ -430,13 +421,11 @@ function getInfoCardBeamPoints(infoCard, activeObject) {
   const cardHeight = cardRect.height;
   const cardCenterX = cardLeft + cardWidth / 2;
   const edgeX = anchorPoint.x < cardCenterX ? cardLeft : cardLeft + cardWidth;
-  const topY = cardTop + Math.min(18, cardHeight * 0.18);
-  const bottomY = cardTop + cardHeight - Math.min(18, cardHeight * 0.18);
 
   return {
-    top: { x: edgeX, y: topY },
+    top: { x: edgeX, y: cardTop },
     center: { x: edgeX, y: cardTop + cardHeight / 2 },
-    bottom: { x: edgeX, y: bottomY }
+    bottom: { x: edgeX, y: cardTop + cardHeight }
   };
 }
 
@@ -473,26 +462,40 @@ function setLinePosition(lineElement, startPoint, endPoint) {
   lineElement.setAttribute("y2", endPoint.y);
 }
 
-function createBeamParticles(polygonOverlay, startPoint, endPoint) {
-  const deltaX = endPoint.x - startPoint.x;
-  const deltaY = endPoint.y - startPoint.y;
-  const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY) || 1;
-  const normalX = -deltaY / length;
-  const normalY = deltaX / length;
+function createBeamParticles(polygonOverlay, startPoint, beamPoints) {
   const particleSettings = [
-    { t: 0.18, offset: -4, r: 1.8, opacity: 0.82 },
-    { t: 0.28, offset: 7, r: 1.3, opacity: 0.7 },
-    { t: 0.38, offset: -10, r: 1.7, opacity: 0.62 },
-    { t: 0.50, offset: 4, r: 1.1, opacity: 0.5 },
-    { t: 0.62, offset: -7, r: 1.4, opacity: 0.4 },
-    { t: 0.74, offset: 9, r: 1.0, opacity: 0.32 },
-    { t: 0.86, offset: -3, r: 1.2, opacity: 0.24 }
+    { t: 0.16, spread: -0.62, r: 1.5, opacity: 0.68 },
+    { t: 0.20, spread: -0.18, r: 1.2, opacity: 0.74 },
+    { t: 0.24, spread: 0.34, r: 1.7, opacity: 0.7 },
+    { t: 0.30, spread: -0.46, r: 1.1, opacity: 0.62 },
+    { t: 0.34, spread: 0.04, r: 1.8, opacity: 0.66 },
+    { t: 0.38, spread: 0.58, r: 1.2, opacity: 0.56 },
+    { t: 0.44, spread: -0.72, r: 1.4, opacity: 0.5 },
+    { t: 0.48, spread: -0.18, r: 1.0, opacity: 0.52 },
+    { t: 0.52, spread: 0.28, r: 1.6, opacity: 0.48 },
+    { t: 0.56, spread: 0.74, r: 1.1, opacity: 0.42 },
+    { t: 0.62, spread: -0.54, r: 1.5, opacity: 0.38 },
+    { t: 0.66, spread: -0.06, r: 1.0, opacity: 0.4 },
+    { t: 0.70, spread: 0.44, r: 1.3, opacity: 0.34 },
+    { t: 0.76, spread: -0.28, r: 1.1, opacity: 0.3 },
+    { t: 0.80, spread: 0.16, r: 1.5, opacity: 0.28 },
+    { t: 0.84, spread: 0.64, r: 1.0, opacity: 0.24 },
+    { t: 0.90, spread: -0.42, r: 1.2, opacity: 0.2 },
+    { t: 0.94, spread: 0.36, r: 0.9, opacity: 0.18 }
   ];
 
   particleSettings.forEach(function (particle) {
     const particleElement = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    const x = startPoint.x + deltaX * particle.t + normalX * particle.offset;
-    const y = startPoint.y + deltaY * particle.t + normalY * particle.offset;
+    const centerX = startPoint.x + (beamPoints.center.x - startPoint.x) * particle.t;
+    const centerY = startPoint.y + (beamPoints.center.y - startPoint.y) * particle.t;
+    const topX = startPoint.x + (beamPoints.top.x - startPoint.x) * particle.t;
+    const topY = startPoint.y + (beamPoints.top.y - startPoint.y) * particle.t;
+    const bottomX = startPoint.x + (beamPoints.bottom.x - startPoint.x) * particle.t;
+    const bottomY = startPoint.y + (beamPoints.bottom.y - startPoint.y) * particle.t;
+    const halfWidthX = (bottomX - topX) / 2;
+    const halfWidthY = (bottomY - topY) / 2;
+    const x = centerX + halfWidthX * particle.spread;
+    const y = centerY + halfWidthY * particle.spread;
 
     particleElement.setAttribute("cx", x);
     particleElement.setAttribute("cy", y);
