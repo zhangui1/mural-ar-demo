@@ -357,48 +357,150 @@ function updateConnectorLine(activeObject) {
     return;
   }
 
-  const attachPoint = {
-    x: Number(infoCard.dataset.attachX),
-    y: Number(infoCard.dataset.attachY)
-  };
+  const beamPoints = getInfoCardBeamPoints(infoCard, activeObject);
 
-  if (!attachPoint.x || !attachPoint.y) {
+  if (!beamPoints) {
     return;
   }
 
+  const gradientId = `connector-gradient-${activeObject.id}`;
+  const gradientElement = createBeamGradient(gradientId, anchorPoint, beamPoints.center);
+  const beamCone = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
   const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
-  const beamElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const topEdgeLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  const bottomEdgeLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
   const anchorGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   const cardGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
-  beamElement.setAttribute("x1", anchorPoint.x);
-  beamElement.setAttribute("y1", anchorPoint.y);
-  beamElement.setAttribute("x2", attachPoint.x);
-  beamElement.setAttribute("y2", attachPoint.y);
-  beamElement.style.setProperty("--beam-length", getLineLength(anchorPoint, attachPoint));
-  beamElement.classList.add("connector-beam");
+  beamCone.setAttribute(
+    "points",
+    `${anchorPoint.x},${anchorPoint.y} ${beamPoints.top.x},${beamPoints.top.y} ${beamPoints.bottom.x},${beamPoints.bottom.y}`
+  );
+  beamCone.setAttribute("fill", `url(#${gradientId})`);
+  beamCone.classList.add("connector-light-cone");
 
   lineElement.setAttribute("x1", anchorPoint.x);
   lineElement.setAttribute("y1", anchorPoint.y);
-  lineElement.setAttribute("x2", attachPoint.x);
-  lineElement.setAttribute("y2", attachPoint.y);
-  lineElement.style.setProperty("--beam-length", getLineLength(anchorPoint, attachPoint));
+  lineElement.setAttribute("x2", beamPoints.center.x);
+  lineElement.setAttribute("y2", beamPoints.center.y);
+  lineElement.style.setProperty("--beam-length", getLineLength(anchorPoint, beamPoints.center));
   lineElement.classList.add("connector-line");
+
+  setLinePosition(topEdgeLine, anchorPoint, beamPoints.top);
+  topEdgeLine.style.setProperty("--beam-length", getLineLength(anchorPoint, beamPoints.top));
+  topEdgeLine.classList.add("connector-edge-line");
+
+  setLinePosition(bottomEdgeLine, anchorPoint, beamPoints.bottom);
+  bottomEdgeLine.style.setProperty("--beam-length", getLineLength(anchorPoint, beamPoints.bottom));
+  bottomEdgeLine.classList.add("connector-edge-line");
 
   anchorGlow.setAttribute("cx", anchorPoint.x);
   anchorGlow.setAttribute("cy", anchorPoint.y);
   anchorGlow.setAttribute("r", 5);
   anchorGlow.classList.add("connector-glow-dot");
 
-  cardGlow.setAttribute("cx", attachPoint.x);
-  cardGlow.setAttribute("cy", attachPoint.y);
-  cardGlow.setAttribute("r", 4);
+  cardGlow.setAttribute("cx", beamPoints.center.x);
+  cardGlow.setAttribute("cy", beamPoints.center.y);
+  cardGlow.setAttribute("r", 5);
   cardGlow.classList.add("connector-glow-dot", "connector-glow-dot--small");
 
-  polygonOverlay.appendChild(beamElement);
+  polygonOverlay.appendChild(gradientElement);
+  polygonOverlay.appendChild(beamCone);
+  polygonOverlay.appendChild(topEdgeLine);
+  polygonOverlay.appendChild(bottomEdgeLine);
   polygonOverlay.appendChild(lineElement);
+  createBeamParticles(polygonOverlay, anchorPoint, beamPoints.center);
   polygonOverlay.appendChild(anchorGlow);
   polygonOverlay.appendChild(cardGlow);
+}
+
+function getInfoCardBeamPoints(infoCard, activeObject) {
+  const muralFrame = document.querySelector("#muralFrame");
+  const anchorPoint = getObjectAnchorPoint(activeObject);
+
+  if (!muralFrame || !anchorPoint) {
+    return null;
+  }
+
+  const frameRect = muralFrame.getBoundingClientRect();
+  const cardRect = infoCard.getBoundingClientRect();
+  const cardLeft = cardRect.left - frameRect.left;
+  const cardTop = cardRect.top - frameRect.top;
+  const cardWidth = cardRect.width;
+  const cardHeight = cardRect.height;
+  const cardCenterX = cardLeft + cardWidth / 2;
+  const edgeX = anchorPoint.x < cardCenterX ? cardLeft : cardLeft + cardWidth;
+  const topY = cardTop + Math.min(18, cardHeight * 0.18);
+  const bottomY = cardTop + cardHeight - Math.min(18, cardHeight * 0.18);
+
+  return {
+    top: { x: edgeX, y: topY },
+    center: { x: edgeX, y: cardTop + cardHeight / 2 },
+    bottom: { x: edgeX, y: bottomY }
+  };
+}
+
+function createBeamGradient(gradientId, anchorPoint, centerPoint) {
+  const gradientElement = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+  const stops = [
+    { offset: "0%", color: "rgba(255, 244, 190, 0.55)" },
+    { offset: "42%", color: "rgba(255, 218, 120, 0.22)" },
+    { offset: "100%", color: "rgba(255, 199, 92, 0.06)" }
+  ];
+
+  gradientElement.setAttribute("id", gradientId);
+  gradientElement.setAttribute("gradientUnits", "userSpaceOnUse");
+  gradientElement.setAttribute("x1", anchorPoint.x);
+  gradientElement.setAttribute("y1", anchorPoint.y);
+  gradientElement.setAttribute("x2", centerPoint.x);
+  gradientElement.setAttribute("y2", centerPoint.y);
+  gradientElement.classList.add("connector-gradient");
+
+  stops.forEach(function (stop) {
+    const stopElement = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stopElement.setAttribute("offset", stop.offset);
+    stopElement.setAttribute("stop-color", stop.color);
+    gradientElement.appendChild(stopElement);
+  });
+
+  return gradientElement;
+}
+
+function setLinePosition(lineElement, startPoint, endPoint) {
+  lineElement.setAttribute("x1", startPoint.x);
+  lineElement.setAttribute("y1", startPoint.y);
+  lineElement.setAttribute("x2", endPoint.x);
+  lineElement.setAttribute("y2", endPoint.y);
+}
+
+function createBeamParticles(polygonOverlay, startPoint, endPoint) {
+  const deltaX = endPoint.x - startPoint.x;
+  const deltaY = endPoint.y - startPoint.y;
+  const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY) || 1;
+  const normalX = -deltaY / length;
+  const normalY = deltaX / length;
+  const particleSettings = [
+    { t: 0.18, offset: -4, r: 1.8, opacity: 0.82 },
+    { t: 0.28, offset: 7, r: 1.3, opacity: 0.7 },
+    { t: 0.38, offset: -10, r: 1.7, opacity: 0.62 },
+    { t: 0.50, offset: 4, r: 1.1, opacity: 0.5 },
+    { t: 0.62, offset: -7, r: 1.4, opacity: 0.4 },
+    { t: 0.74, offset: 9, r: 1.0, opacity: 0.32 },
+    { t: 0.86, offset: -3, r: 1.2, opacity: 0.24 }
+  ];
+
+  particleSettings.forEach(function (particle) {
+    const particleElement = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    const x = startPoint.x + deltaX * particle.t + normalX * particle.offset;
+    const y = startPoint.y + deltaY * particle.t + normalY * particle.offset;
+
+    particleElement.setAttribute("cx", x);
+    particleElement.setAttribute("cy", y);
+    particleElement.setAttribute("r", particle.r);
+    particleElement.style.opacity = particle.opacity;
+    particleElement.classList.add("connector-particle");
+    polygonOverlay.appendChild(particleElement);
+  });
 }
 
 function getLineLength(startPoint, endPoint) {
@@ -408,9 +510,13 @@ function getLineLength(startPoint, endPoint) {
 }
 
 function removeConnectorLine() {
-  document.querySelectorAll(".connector-line, .connector-beam, .connector-glow-dot").forEach(function (element) {
-    element.remove();
-  });
+  document
+    .querySelectorAll(
+      ".connector-line, .connector-edge-line, .connector-light-cone, .connector-gradient, .connector-glow-dot, .connector-particle"
+    )
+    .forEach(function (element) {
+      element.remove();
+    });
 }
 
 function clamp(value, min, max) {
