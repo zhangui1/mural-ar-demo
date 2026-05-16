@@ -112,3 +112,33 @@ mural_001.png
 - `summary`：信息卡片中的简介文字。
 
 如果只想修改文案，通常只需要改 `name`、`category`、`summary`。如果对象轮廓不准，需要重新调整 `polygon`，并同步检查 `anchor` 和 `cardPosition`。
+
+## LabelMe 标注流程
+
+1. 安装 LabelMe。
+2. 用 LabelMe 打开当前壁画图片。
+3. 使用 polygon 工具沿对象轮廓标注。
+4. 每个对象的 label 建议写成：
+
+```text
+名称|类别
+```
+
+例如：
+
+```text
+中央主尊|人物
+建筑元素|建筑
+器物元素|器物
+```
+
+5. 保存 LabelMe JSON。建议放在本地 `annotations/` 目录。
+6. 运行转换脚本：
+
+```powershell
+python tools/labelme_to_objects.py annotations/mural_001.json data/objects.json
+```
+
+7. 启动本地服务，刷新页面检查 polygon、卡片和光束是否对齐。
+
+图片、标注 JSON、转换后的 `data/objects.json` 可以只作为本地数据使用。如果文件较大或只是本地测试数据，不需要提交到 GitHub。
