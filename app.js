@@ -12,6 +12,7 @@ const MURAL_IMAGE_CANDIDATES = [
 async function initializeApp() {
   console.log("Mural AR Demo initialized.");
   showMuralImageWhenAvailable();
+  bindObjectNavigationButtons();
   await loadDemoData();
 }
 
@@ -177,6 +178,54 @@ function setActiveObject(objectId) {
   updateActivePolygonClass();
   updateInfoCard();
   console.log("Active objects:", activeObjectIds);
+}
+
+function showOnlyActiveObject(objectId) {
+  activeObjectIds = [objectId];
+  updateActivePolygonClass();
+  updateInfoCard();
+  console.log("Active objects:", activeObjectIds);
+}
+
+function getCurrentNavigationIndex() {
+  const latestActiveObjectId = activeObjectIds[activeObjectIds.length - 1];
+  const activeIndex = objectData.findIndex(function (objectItem) {
+    return objectItem.id === latestActiveObjectId;
+  });
+
+  return activeIndex >= 0 ? activeIndex : -1;
+}
+
+function navigateObject(direction) {
+  if (objectData.length === 0) {
+    return;
+  }
+
+  const currentIndex = getCurrentNavigationIndex();
+  const nextIndex = currentIndex === -1
+    ? 0
+    : (currentIndex + direction + objectData.length) % objectData.length;
+
+  showOnlyActiveObject(objectData[nextIndex].id);
+}
+
+function bindObjectNavigationButtons() {
+  const previousButton = document.querySelector("#previousObjectButton");
+  const nextButton = document.querySelector("#nextObjectButton");
+
+  if (previousButton) {
+    previousButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      navigateObject(-1);
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      navigateObject(1);
+    });
+  }
 }
 
 function clearActiveObject() {
