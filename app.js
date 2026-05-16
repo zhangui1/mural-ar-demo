@@ -711,6 +711,16 @@ document.addEventListener("click", function (event) {
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     clearActiveObject();
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    navigateObject(-1);
+    return;
+  }
+
+  if (event.key === "ArrowRight") {
+    navigateObject(1);
   }
 });
 
