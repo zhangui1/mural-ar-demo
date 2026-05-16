@@ -1,5 +1,6 @@
 import argparse
 import json
+from pathlib import Path
 
 
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
@@ -55,6 +56,15 @@ def convert_shapes_to_polygons(image_width, image_height, polygon_shapes):
     return polygons
 
 
+def write_objects_json(output_path, objects):
+    output_file = Path(output_path)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(output_file, "w", encoding="utf-8") as file:
+        json.dump(objects, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+
+
 def parse_label(label):
     if "|" not in label:
         return label.strip(), "未分类"
@@ -100,9 +110,9 @@ def main():
     args = parse_args()
     image_width, image_height, polygon_shapes = load_labelme_json(args.input_json)
     objects = convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes)
-    print(f"Image size: {image_width} x {image_height}")
-    print(f"Polygon shapes: {len(polygon_shapes)}")
-    print(json.dumps(objects, ensure_ascii=False, indent=2))
+    write_objects_json(args.output_json, objects)
+    print(f"Converted {len(objects)} objects.")
+    print(f"Output: {args.output_json}")
 
 
 if __name__ == "__main__":
