@@ -244,8 +244,28 @@ body {
   pointer-events: auto;
 }
 
+.info-card__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  color: #f8e8bd;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.info-card__close:hover {
+  background: rgba(255, 232, 170, 0.16);
+}
+
 .info-card__category {
   margin: 0 0 8px;
+  padding-right: 24px;
   color: #e6c56c;
   font-size: 13px;
 }
