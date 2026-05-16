@@ -52,13 +52,36 @@ def convert_shapes_to_polygons(image_width, image_height, polygon_shapes):
     return polygons
 
 
+def parse_label(label):
+    if "|" not in label:
+        return label.strip(), "未分类"
+
+    name, category = label.split("|", 1)
+    return name.strip(), category.strip()
+
+
+def convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes):
+    objects = []
+
+    for index, shape in enumerate(polygon_shapes, start=1):
+        name, category = parse_label(shape.get("label", f"对象{index}"))
+        objects.append({
+            "id": f"obj_{index:03d}",
+            "name": name,
+            "category": category,
+            "polygon": normalize_polygon(shape["points"], image_width, image_height)
+        })
+
+    return objects
+
+
 def main():
     args = parse_args()
     image_width, image_height, polygon_shapes = load_labelme_json(args.input_json)
-    polygons = convert_shapes_to_polygons(image_width, image_height, polygon_shapes)
+    objects = convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes)
     print(f"Image size: {image_width} x {image_height}")
     print(f"Polygon shapes: {len(polygon_shapes)}")
-    print(json.dumps(polygons, ensure_ascii=False, indent=2))
+    print(json.dumps(objects, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
