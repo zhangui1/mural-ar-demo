@@ -30,11 +30,35 @@ def load_labelme_json(input_path):
     return image_width, image_height, polygon_shapes
 
 
+def normalize_point(point, image_width, image_height):
+    x = round(point[0] / image_width, 6)
+    y = round(point[1] / image_height, 6)
+    return [x, y]
+
+
+def normalize_polygon(points, image_width, image_height):
+    return [
+        normalize_point(point, image_width, image_height)
+        for point in points
+    ]
+
+
+def convert_shapes_to_polygons(image_width, image_height, polygon_shapes):
+    polygons = []
+
+    for shape in polygon_shapes:
+        polygons.append(normalize_polygon(shape["points"], image_width, image_height))
+
+    return polygons
+
+
 def main():
     args = parse_args()
     image_width, image_height, polygon_shapes = load_labelme_json(args.input_json)
+    polygons = convert_shapes_to_polygons(image_width, image_height, polygon_shapes)
     print(f"Image size: {image_width} x {image_height}")
     print(f"Polygon shapes: {len(polygon_shapes)}")
+    print(json.dumps(polygons, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
