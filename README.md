@@ -41,7 +41,13 @@
 
 ## 运行方式
 
-在项目根目录运行：
+先进入项目根目录：
+
+```powershell
+cd "F:\zhi yuan\Viture\mural_ar_demo"
+```
+
+然后启动本地静态服务：
 
 ```powershell
 python -m http.server 8000
@@ -53,7 +59,13 @@ python -m http.server 8000
 http://localhost:8000
 ```
 
-不建议直接双击 `index.html` 打开页面，因为后续加载本地 JSON 文件时，浏览器可能会因为本地文件访问限制导致加载失败。
+如果本机 `localhost` 不通，可以访问：
+
+```text
+http://127.0.0.1:8000
+```
+
+不建议直接双击 `index.html` 打开页面，因为页面需要通过 `fetch` 加载本地 JSON 文件。直接用文件方式打开时，浏览器可能会因为本地文件访问限制导致 JSON 加载失败。
 
 壁画图片请放在：
 
