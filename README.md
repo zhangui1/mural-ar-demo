@@ -79,3 +79,22 @@ assets/murals/
 mural_001.jpg
 mural_001.png
 ```
+
+## 替换壁画图片
+
+把新的壁画图片放入：
+
+```text
+assets/murals/
+```
+
+并命名为下面任意一种：
+
+```text
+mural_001.jpg
+mural_001.png
+```
+
+建议优先使用压缩后的 `mural_001.jpg`。如果图片超过 GitHub 普通单文件 100 MB 限制，不要直接提交到普通 Git 仓库。
+
+替换图片后，原来的 polygon 坐标通常会错位。原因是 `data/objects.json` 里的 `polygon`、`anchor`、`cardPosition` 都是基于当前图片位置和尺寸标注的。换成新图后，应重新用 LabelMe 标注并重新生成 `objects.json`。
