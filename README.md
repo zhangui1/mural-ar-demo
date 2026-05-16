@@ -98,3 +98,17 @@ mural_001.png
 建议优先使用压缩后的 `mural_001.jpg`。如果图片超过 GitHub 普通单文件 100 MB 限制，不要直接提交到普通 Git 仓库。
 
 替换图片后，原来的 polygon 坐标通常会错位。原因是 `data/objects.json` 里的 `polygon`、`anchor`、`cardPosition` 都是基于当前图片位置和尺寸标注的。换成新图后，应重新用 LabelMe 标注并重新生成 `objects.json`。
+
+## objects.json 字段说明
+
+`data/objects.json` 是页面加载的对象标注数据。每个对象包含：
+
+- `id`：对象唯一编号，例如 `obj_001`。不要重复。
+- `name`：对象名称，显示在 tooltip 和信息卡片标题中。
+- `category`：对象类别，显示在信息卡片上方，例如 `人物`、`建筑`、`器物`。
+- `polygon`：对象轮廓点数组，使用 0 到 1 的归一化坐标。`[0.5, 0.3]` 表示图片宽度 50%、高度 30% 的位置。
+- `anchor`：光束从对象发出的锚点位置，也使用归一化坐标。通常位于对象中心或重要视觉点附近。
+- `cardPosition`：信息卡片的初始位置，也使用归一化坐标。可以手动微调用来避开主体画面。
+- `summary`：信息卡片中的简介文字。
+
+如果只想修改文案，通常只需要改 `name`、`category`、`summary`。如果对象轮廓不准，需要重新调整 `polygon`，并同步检查 `anchor` 和 `cardPosition`。
