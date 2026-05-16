@@ -1,6 +1,6 @@
 let muralData = null;
 let objectData = [];
-let activeObjectId = null;
+let activeObjectIds = [];
 const DEBUG_POLYGON = true;
 const DEBUG_ANCHOR = true;
 const MURAL_IMAGE_CANDIDATES = [
@@ -165,22 +165,25 @@ function bindPolygonActiveState(polygonElement, objectItem) {
 }
 
 function setActiveObject(objectId) {
-  activeObjectId = objectId;
+  if (!activeObjectIds.includes(objectId)) {
+    activeObjectIds.push(objectId);
+  }
+
   updateActivePolygonClass();
   updateInfoCard();
-  console.log("Active object:", activeObjectId);
+  console.log("Active objects:", activeObjectIds);
 }
 
 function clearActiveObject() {
-  if (!activeObjectId) {
+  if (activeObjectIds.length === 0) {
     return;
   }
 
-  activeObjectId = null;
+  activeObjectIds = [];
   updateActivePolygonClass();
   updateInfoCard();
   hideObjectTooltip();
-  console.log("Active object cleared.");
+  console.log("Active objects cleared.");
 }
 
 function updateActivePolygonClass() {
@@ -189,17 +192,17 @@ function updateActivePolygonClass() {
   const muralFrame = document.querySelector("#muralFrame");
 
   polygonElements.forEach(function (polygonElement) {
-    const isActive = polygonElement.dataset.objectId === activeObjectId;
+    const isActive = activeObjectIds.includes(polygonElement.dataset.objectId);
     polygonElement.classList.toggle("is-active", isActive);
-    polygonElement.classList.toggle("is-muted", Boolean(activeObjectId) && !isActive);
+    polygonElement.classList.toggle("is-muted", activeObjectIds.length > 0 && !isActive);
   });
 
   if (dimLayer) {
-    dimLayer.hidden = !activeObjectId;
+    dimLayer.hidden = activeObjectIds.length === 0;
   }
 
   if (muralFrame) {
-    muralFrame.classList.toggle("is-focus-mode", Boolean(activeObjectId));
+    muralFrame.classList.toggle("is-focus-mode", activeObjectIds.length > 0);
   }
 }
 
@@ -208,8 +211,9 @@ function updateInfoCard() {
   const categoryElement = document.querySelector("#infoCardCategory");
   const titleElement = document.querySelector("#infoCardTitle");
   const summaryElement = document.querySelector("#infoCardSummary");
+  const latestActiveObjectId = activeObjectIds[activeObjectIds.length - 1];
   const activeObject = objectData.find(function (objectItem) {
-    return objectItem.id === activeObjectId;
+    return objectItem.id === latestActiveObjectId;
   });
 
   if (!infoCard || !categoryElement || !titleElement || !summaryElement) {
