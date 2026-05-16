@@ -222,11 +222,17 @@ body {
   white-space: nowrap;
 }
 
+.info-card-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
 .info-card {
   position: absolute;
   left: 28px;
   top: 28px;
-  z-index: 4;
   width: min(300px, calc(100% - 40px));
   padding: 18px 20px;
   border: 1px solid rgba(255, 232, 170, 0.38);
@@ -235,6 +241,7 @@ body {
   background: rgba(29, 24, 17, 0.92);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
   animation: infoCardPop 220ms ease-out;
+  pointer-events: auto;
 }
 
 .info-card__category {

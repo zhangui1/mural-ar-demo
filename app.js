@@ -212,34 +212,65 @@ function updateActivePolygonClass() {
 }
 
 function updateInfoCard() {
-  const infoCard = document.querySelector("#infoCard");
-  const categoryElement = document.querySelector("#infoCardCategory");
-  const titleElement = document.querySelector("#infoCardTitle");
-  const summaryElement = document.querySelector("#infoCardSummary");
-  const latestActiveObjectId = activeObjectIds[activeObjectIds.length - 1];
-  const activeObject = objectData.find(function (objectItem) {
-    return objectItem.id === latestActiveObjectId;
-  });
+  const cardLayer = document.querySelector("#infoCardLayer");
+  const activeObjects = getActiveObjects();
 
-  if (!infoCard || !categoryElement || !titleElement || !summaryElement) {
+  if (!cardLayer) {
     return;
   }
 
-  if (!activeObject) {
-    infoCard.hidden = true;
+  cardLayer.innerHTML = "";
+
+  if (activeObjects.length === 0) {
     removeAnchorDebugPoint();
     removeConnectorLine();
     return;
   }
 
+  activeObjects.forEach(function (activeObject) {
+    const infoCard = createInfoCard(activeObject);
+    cardLayer.appendChild(infoCard);
+    positionInfoCard(infoCard, activeObject);
+    updateInfoCardAttachPoint(infoCard, activeObject);
+  });
+
+  updateAnchorDebugPoint(activeObjects[activeObjects.length - 1]);
+  updateConnectorLine(activeObjects[activeObjects.length - 1]);
+}
+
+function getActiveObjects() {
+  return activeObjectIds
+    .map(function (objectId) {
+      return objectData.find(function (objectItem) {
+        return objectItem.id === objectId;
+      });
+    })
+    .filter(Boolean);
+}
+
+function createInfoCard(activeObject) {
+  const infoCard = document.createElement("article");
+  const categoryElement = document.createElement("p");
+  const titleElement = document.createElement("h2");
+  const summaryElement = document.createElement("p");
+
+  infoCard.classList.add("info-card");
+  infoCard.dataset.objectId = activeObject.id;
+
+  categoryElement.classList.add("info-card__category");
   categoryElement.textContent = activeObject.category;
+
+  titleElement.classList.add("info-card__title");
   titleElement.textContent = activeObject.name;
+
+  summaryElement.classList.add("info-card__summary");
   summaryElement.textContent = activeObject.summary;
-  infoCard.hidden = false;
-  positionInfoCard(infoCard, activeObject);
-  updateInfoCardAttachPoint(infoCard, activeObject);
-  updateAnchorDebugPoint(activeObject);
-  updateConnectorLine(activeObject);
+
+  infoCard.appendChild(categoryElement);
+  infoCard.appendChild(titleElement);
+  infoCard.appendChild(summaryElement);
+
+  return infoCard;
 }
 
 function getObjectAnchorPoint(activeObject) {
@@ -357,12 +388,12 @@ function updateInfoCardAttachPoint(infoCard, activeObject) {
 
 function updateConnectorLine(activeObject) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
-  const infoCard = document.querySelector("#infoCard");
+  const infoCard = document.querySelector(`.info-card[data-object-id="${activeObject.id}"]`);
   const anchorPoint = getObjectAnchorPoint(activeObject);
 
   removeConnectorLine();
 
-  if (!polygonOverlay || !infoCard || !anchorPoint || infoCard.hidden) {
+  if (!polygonOverlay || !infoCard || !anchorPoint) {
     return;
   }
 
@@ -587,12 +618,12 @@ function hideObjectTooltip() {
 
 document.addEventListener("click", function (event) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
-  const infoCard = document.querySelector("#infoCard");
+  const infoCardLayer = document.querySelector("#infoCardLayer");
 
   if (
     !polygonOverlay ||
     polygonOverlay.contains(event.target) ||
-    (infoCard && infoCard.contains(event.target))
+    (infoCardLayer && infoCardLayer.contains(event.target))
   ) {
     return;
   }
