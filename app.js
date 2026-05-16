@@ -88,6 +88,7 @@ function showMissingMuralMessage(muralImage, missingMessage) {
 
 function updateOverlaySize() {
   const muralFrame = document.querySelector("#muralFrame");
+  const muralImage = document.querySelector("#muralImage");
   const polygonOverlay = document.querySelector("#polygonOverlay");
 
   if (!muralFrame || !polygonOverlay) {
@@ -95,9 +96,21 @@ function updateOverlaySize() {
   }
 
   const frameRect = muralFrame.getBoundingClientRect();
-  polygonOverlay.setAttribute("viewBox", `0 0 ${frameRect.width} ${frameRect.height}`);
-  polygonOverlay.setAttribute("width", frameRect.width);
-  polygonOverlay.setAttribute("height", frameRect.height);
+  const imageIsVisible = muralImage && !muralImage.hidden && muralImage.naturalWidth > 0;
+  const targetRect = imageIsVisible ? muralImage.getBoundingClientRect() : frameRect;
+  const frameStyle = window.getComputedStyle(muralFrame);
+  const borderLeft = parseFloat(frameStyle.borderLeftWidth) || 0;
+  const borderTop = parseFloat(frameStyle.borderTopWidth) || 0;
+  const left = targetRect.left - frameRect.left - borderLeft;
+  const top = targetRect.top - frameRect.top - borderTop;
+
+  polygonOverlay.style.left = `${left}px`;
+  polygonOverlay.style.top = `${top}px`;
+  polygonOverlay.style.width = `${targetRect.width}px`;
+  polygonOverlay.style.height = `${targetRect.height}px`;
+  polygonOverlay.setAttribute("viewBox", `0 0 ${targetRect.width} ${targetRect.height}`);
+  polygonOverlay.setAttribute("width", targetRect.width);
+  polygonOverlay.setAttribute("height", targetRect.height);
   renderObjectPolygons();
 }
 
@@ -396,16 +409,20 @@ function removeAnchorDebugPoint() {
 
 function positionInfoCard(infoCard, activeObject) {
   const muralFrame = document.querySelector("#muralFrame");
+  const polygonOverlay = document.querySelector("#polygonOverlay");
 
-  if (!muralFrame || !activeObject.cardPosition) {
+  if (!muralFrame || !polygonOverlay || !activeObject.cardPosition) {
     return;
   }
 
   const frameRect = muralFrame.getBoundingClientRect();
+  const overlayRect = polygonOverlay.getBoundingClientRect();
   const cardRect = infoCard.getBoundingClientRect();
+  const overlayLeft = overlayRect.left - frameRect.left;
+  const overlayTop = overlayRect.top - frameRect.top;
   const safeGap = 16;
-  const rawLeft = activeObject.cardPosition[0] * frameRect.width;
-  const rawTop = activeObject.cardPosition[1] * frameRect.height;
+  const rawLeft = overlayLeft + activeObject.cardPosition[0] * overlayRect.width;
+  const rawTop = overlayTop + activeObject.cardPosition[1] * overlayRect.height;
   const maxLeft = Math.max(safeGap, frameRect.width - cardRect.width - safeGap);
   const maxTop = Math.max(safeGap, frameRect.height - cardRect.height - safeGap);
   const left = clamp(rawLeft, safeGap, maxLeft);
@@ -416,17 +433,17 @@ function positionInfoCard(infoCard, activeObject) {
 }
 
 function getInfoCardAttachPoint(infoCard, activeObject) {
-  const muralFrame = document.querySelector("#muralFrame");
+  const polygonOverlay = document.querySelector("#polygonOverlay");
   const anchorPoint = getObjectAnchorPoint(activeObject);
 
-  if (!muralFrame || !anchorPoint) {
+  if (!polygonOverlay || !anchorPoint) {
     return null;
   }
 
-  const frameRect = muralFrame.getBoundingClientRect();
+  const overlayRect = polygonOverlay.getBoundingClientRect();
   const cardRect = infoCard.getBoundingClientRect();
-  const cardLeft = cardRect.left - frameRect.left;
-  const cardTop = cardRect.top - frameRect.top;
+  const cardLeft = cardRect.left - overlayRect.left;
+  const cardTop = cardRect.top - overlayRect.top;
   const cardWidth = cardRect.width;
   const cardHeight = cardRect.height;
   const cardCenterX = cardLeft + cardWidth / 2;
@@ -523,17 +540,17 @@ function updateConnectorLine(activeObject) {
 }
 
 function getInfoCardBeamPoints(infoCard, activeObject) {
-  const muralFrame = document.querySelector("#muralFrame");
+  const polygonOverlay = document.querySelector("#polygonOverlay");
   const anchorPoint = getObjectAnchorPoint(activeObject);
 
-  if (!muralFrame || !anchorPoint) {
+  if (!polygonOverlay || !anchorPoint) {
     return null;
   }
 
-  const frameRect = muralFrame.getBoundingClientRect();
+  const overlayRect = polygonOverlay.getBoundingClientRect();
   const cardRect = infoCard.getBoundingClientRect();
-  const cardLeft = cardRect.left - frameRect.left;
-  const cardTop = cardRect.top - frameRect.top;
+  const cardLeft = cardRect.left - overlayRect.left;
+  const cardTop = cardRect.top - overlayRect.top;
   const cardWidth = cardRect.width;
   const cardHeight = cardRect.height;
   const cardCenterX = cardLeft + cardWidth / 2;
