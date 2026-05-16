@@ -3,6 +3,7 @@ let objectData = [];
 let activeObjectIds = [];
 const DEBUG_POLYGON = true;
 const DEBUG_ANCHOR = true;
+const MAX_ACTIVE_OBJECTS = 2;
 const MURAL_IMAGE_CANDIDATES = [
   "assets/murals/mural_001.jpg",
   "assets/murals/mural_001.png"
@@ -167,6 +168,10 @@ function bindPolygonActiveState(polygonElement, objectItem) {
 function setActiveObject(objectId) {
   if (!activeObjectIds.includes(objectId)) {
     activeObjectIds.push(objectId);
+  }
+
+  if (activeObjectIds.length > MAX_ACTIVE_OBJECTS) {
+    activeObjectIds.shift();
   }
 
   updateActivePolygonClass();
