@@ -142,3 +142,50 @@ python tools/labelme_to_objects.py annotations/mural_001.json data/objects.json
 7. 启动本地服务，刷新页面检查 polygon、卡片和光束是否对齐。
 
 图片、标注 JSON、转换后的 `data/objects.json` 可以只作为本地数据使用。如果文件较大或只是本地测试数据，不需要提交到 GitHub。
+
+## 常见问题
+
+### 1. 为什么直接打开 index.html 可能无法加载 JSON？
+
+页面使用 `fetch` 加载 `data/mural.json` 和 `data/objects.json`。直接双击 `index.html` 时，浏览器可能会限制本地文件读取，导致 JSON 加载失败。请使用 `python -m http.server 8000` 启动本地服务。
+
+### 2. 如何用 python -m http.server 启动？
+
+在项目根目录运行：
+
+```powershell
+python -m http.server 8000
+```
+
+然后访问 `http://localhost:8000` 或 `http://127.0.0.1:8000`。
+
+### 3. polygon 不对齐怎么办？
+
+先确认图片是否被替换过。如果换过图片，需要重新标注。也可以检查 `data/objects.json` 中的 `polygon` 是否使用 0 到 1 的归一化坐标。
+
+### 4. 图片替换后为什么对象位置错了？
+
+对象坐标是基于原图标注的。新图片的尺寸、裁切、内容位置不同，都会导致原坐标错位，所以替换图片后应重新用 LabelMe 标注。
+
+### 5. 如何调整信息卡片位置？
+
+修改 `data/objects.json` 中对应对象的 `cardPosition`。`x` 越大越靠右，`y` 越大越靠下。
+
+### 6. 如何修改发光颜色？
+
+在 `style.css` 中搜索 `.object-polygon.is-active`、`.connector-light-cone`、`.connector-particle`，调整其中的 `rgba(...)` 颜色即可。
+
+### 7. git push 失败怎么办？
+
+先运行 `git status`，确认没有误提交大文件或本地数据。如果提示单文件超过 100 MB，不要把大图直接提交到普通 GitHub 仓库，可以改用压缩图片或 Git LFS。
+
+### 8. GitHub 仓库为空怎么办？
+
+确认已经绑定远程仓库并推送：
+
+```powershell
+git remote -v
+git push -u origin main
+```
+
+如果远程地址不对，用 `git remote set-url origin 仓库地址` 修正后再推送。
