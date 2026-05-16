@@ -324,22 +324,12 @@ function getActiveObjects() {
 
 function createInfoCard(activeObject) {
   const infoCard = document.createElement("article");
-  const closeButton = document.createElement("button");
   const categoryElement = document.createElement("p");
   const titleElement = document.createElement("h2");
   const summaryElement = document.createElement("p");
 
   infoCard.classList.add("info-card");
   infoCard.dataset.objectId = activeObject.id;
-
-  closeButton.type = "button";
-  closeButton.classList.add("info-card__close");
-  closeButton.setAttribute("aria-label", `关闭${activeObject.name}`);
-  closeButton.textContent = "×";
-  closeButton.addEventListener("click", function (event) {
-    event.stopPropagation();
-    closeActiveObject(activeObject.id);
-  });
 
   categoryElement.classList.add("info-card__category");
   categoryElement.textContent = activeObject.category;
@@ -350,7 +340,6 @@ function createInfoCard(activeObject) {
   summaryElement.classList.add("info-card__summary");
   summaryElement.textContent = activeObject.summary;
 
-  infoCard.appendChild(closeButton);
   infoCard.appendChild(categoryElement);
   infoCard.appendChild(titleElement);
   infoCard.appendChild(summaryElement);

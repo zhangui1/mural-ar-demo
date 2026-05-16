@@ -88,7 +88,7 @@ body {
 }
 
 .mural-frame.is-focus-mode img {
-  filter: blur(5px);
+  filter: blur(1.4px);
 }
 
 .polygon-overlay {
@@ -128,20 +128,20 @@ body {
 }
 
 .object-polygon.is-muted {
-  fill: rgba(255, 205, 97, 0.07);
-  stroke: rgba(255, 205, 97, 0.2);
-  filter: blur(4px);
+  fill: rgba(255, 205, 97, 0.03);
+  stroke: rgba(255, 205, 97, 0.08);
+  filter: blur(1px);
 }
 
 .object-polygon.is-active {
-  fill: rgba(255, 222, 142, 0.32);
-  stroke: rgba(255, 247, 216, 1);
-  stroke-width: 3;
+  fill: rgba(255, 222, 142, 0.16);
+  stroke: rgba(255, 247, 216, 0.58);
+  stroke-width: 1.6;
   transform: scale(1.05);
   filter:
-    drop-shadow(0 0 5px rgba(255, 231, 160, 0.82))
-    drop-shadow(0 0 14px rgba(255, 190, 82, 0.42))
-    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.32));
+    drop-shadow(0 0 4px rgba(255, 231, 160, 0.36))
+    drop-shadow(0 0 10px rgba(255, 190, 82, 0.18))
+    drop-shadow(0 10px 16px rgba(0, 0, 0, 0.24));
 }
 
 .anchor-debug-point {
@@ -267,28 +267,8 @@ body {
   pointer-events: auto;
 }
 
-.info-card__close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: 50%;
-  color: #f8e8bd;
-  background: rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 28px;
-}
-
-.info-card__close:hover {
-  background: rgba(255, 232, 170, 0.16);
-}
-
 .info-card__category {
   margin: 0 0 8px;
-  padding-right: 24px;
   color: #e6c56c;
   font-size: 13px;
 }
