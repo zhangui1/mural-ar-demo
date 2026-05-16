@@ -2,6 +2,9 @@ import argparse
 import json
 
 
+DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Convert LabelMe polygon annotations to mural demo objects.json."
@@ -65,14 +68,32 @@ def convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes):
 
     for index, shape in enumerate(polygon_shapes, start=1):
         name, category = parse_label(shape.get("label", f"对象{index}"))
+        polygon = normalize_polygon(shape["points"], image_width, image_height)
+        anchor = build_anchor(polygon)
         objects.append({
             "id": f"obj_{index:03d}",
             "name": name,
             "category": category,
-            "polygon": normalize_polygon(shape["points"], image_width, image_height)
+            "polygon": polygon,
+            "anchor": anchor,
+            "cardPosition": build_card_position(anchor),
+            "summary": DEFAULT_SUMMARY
         })
 
     return objects
+
+
+def build_anchor(polygon):
+    point_count = len(polygon)
+    anchor_x = sum(point[0] for point in polygon) / point_count
+    anchor_y = sum(point[1] for point in polygon) / point_count
+    return [round(anchor_x, 6), round(anchor_y, 6)]
+
+
+def build_card_position(anchor):
+    card_x = min(anchor[0] + 0.18, 0.82)
+    card_y = max(anchor[1] - 0.08, 0.08)
+    return [round(card_x, 6), round(card_y, 6)]
 
 
 def main():
