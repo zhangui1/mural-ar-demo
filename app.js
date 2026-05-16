@@ -235,7 +235,7 @@ function updateInfoCard() {
   });
 
   updateAnchorDebugPoint(activeObjects[activeObjects.length - 1]);
-  updateConnectorLine(activeObjects[activeObjects.length - 1]);
+  updateConnectorLines(activeObjects);
 }
 
 function getActiveObjects() {
@@ -386,12 +386,18 @@ function updateInfoCardAttachPoint(infoCard, activeObject) {
   infoCard.dataset.attachY = attachPoint.y;
 }
 
+function updateConnectorLines(activeObjects) {
+  removeConnectorLine();
+
+  activeObjects.forEach(function (activeObject) {
+    updateConnectorLine(activeObject);
+  });
+}
+
 function updateConnectorLine(activeObject) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
   const infoCard = document.querySelector(`.info-card[data-object-id="${activeObject.id}"]`);
   const anchorPoint = getObjectAnchorPoint(activeObject);
-
-  removeConnectorLine();
 
   if (!polygonOverlay || !infoCard || !anchorPoint) {
     return;
