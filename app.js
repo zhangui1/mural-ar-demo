@@ -18,8 +18,9 @@ async function initializeApp() {
 
 async function loadDemoData() {
   try {
-    const muralResponse = await fetch("data/mural.json");
-    const objectsResponse = await fetch("data/objects.json");
+    const cacheKey = Date.now();
+    const muralResponse = await fetch(`data/mural.json?v=${cacheKey}`, { cache: "no-store" });
+    const objectsResponse = await fetch(`data/objects.json?v=${cacheKey}`, { cache: "no-store" });
 
     muralData = await muralResponse.json();
     objectData = await objectsResponse.json();
