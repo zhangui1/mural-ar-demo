@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
+DEFAULT_CATEGORY = "未分类"
 COORDINATE_PRECISION = 6
 SUPPORTED_SHAPE_TYPE = "polygon"
 USAGE_EXAMPLE = (
@@ -93,11 +94,14 @@ def write_objects_json(output_path, objects):
 
 
 def parse_label(label):
+    label = str(label).strip()
+
     if "|" not in label:
-        return label.strip(), "未分类"
+        return label, DEFAULT_CATEGORY
 
     name, category = label.split("|", 1)
-    return name.strip(), category.strip()
+    # LabelMe 的 label 由人工输入，空类别统一收敛为“未分类”。
+    return name.strip(), category.strip() or DEFAULT_CATEGORY
 
 
 def convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes):
