@@ -529,7 +529,11 @@ async function sendCapturedFrameToRecognitionApi() {
 
     latestRecognitionResult = await response.json();
     updateRecognitionResult(latestRecognitionResult);
-    updateCameraStatus("当前帧已完成识别。");
+    handleRecognitionGuideState(latestRecognitionResult);
+
+    if (!latestRecognitionResult.matched) {
+      updateCameraStatus("当前帧已完成识别，未识别到目标壁画。");
+    }
   } catch (error) {
     console.error("Failed to recognize camera frame:", error);
     latestRecognitionResult = null;
@@ -575,6 +579,28 @@ function setTextContent(selector, text) {
 
   if (element) {
     element.textContent = text;
+  }
+}
+
+function handleRecognitionGuideState(result) {
+  if (!result || !result.matched || result.mural_id !== "mural_001") {
+    return;
+  }
+
+  updateCameraStatus("已识别当前壁画，已加载导览数据。");
+  clearActiveObject();
+  updateOverlaySize();
+  scrollMuralIntoView();
+}
+
+function scrollMuralIntoView() {
+  const muralFrame = document.querySelector("#muralFrame");
+
+  if (muralFrame) {
+    muralFrame.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
   }
 }
 
