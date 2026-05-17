@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
+COORDINATE_PRECISION = 6
 SUPPORTED_SHAPE_TYPE = "polygon"
 USAGE_EXAMPLE = (
     "python tools/labelme_to_objects.py "
@@ -27,10 +28,16 @@ def load_labelme_json(input_path):
 
     image_width = labelme_data["imageWidth"]
     image_height = labelme_data["imageHeight"]
+    ensure_positive_image_size(image_width, image_height)
     shapes = labelme_data.get("shapes", [])
     polygon_shapes = collect_polygon_shapes(shapes)
 
     return image_width, image_height, polygon_shapes
+
+
+def ensure_positive_image_size(image_width, image_height):
+    if image_width <= 0 or image_height <= 0:
+        raise ValueError("LabelMe JSON 中的 imageWidth 和 imageHeight 必须大于 0。")
 
 
 def collect_polygon_shapes(shapes):
@@ -54,8 +61,9 @@ def collect_polygon_shapes(shapes):
 
 
 def normalize_point(point, image_width, image_height):
-    x = round(point[0] / image_width, 6)
-    y = round(point[1] / image_height, 6)
+    # 前端统一读取 0~1 坐标，保留 6 位小数方便人工检查 diff。
+    x = round(point[0] / image_width, COORDINATE_PRECISION)
+    y = round(point[1] / image_height, COORDINATE_PRECISION)
     return [x, y]
 
 
