@@ -16,6 +16,7 @@ async function initializeApp() {
   console.log("Mural AR Demo initialized.");
   showMuralImageWhenAvailable();
   bindObjectNavigationButtons();
+  bindCameraModeButton();
   await loadDemoData();
 }
 
@@ -369,6 +370,37 @@ function updateNavigationState() {
 
   if (nextButton) {
     nextButton.disabled = !hasObjects;
+  }
+}
+
+function bindCameraModeButton() {
+  const cameraModeButton = document.querySelector("#cameraModeButton");
+
+  if (!cameraModeButton) {
+    return;
+  }
+
+  cameraModeButton.addEventListener("click", function () {
+    toggleCameraPreview();
+  });
+}
+
+function toggleCameraPreview() {
+  const cameraPreviewPanel = document.querySelector("#cameraPreviewPanel");
+
+  if (!cameraPreviewPanel) {
+    return;
+  }
+
+  cameraPreviewPanel.hidden = !cameraPreviewPanel.hidden;
+  updateCameraStatus(cameraPreviewPanel.hidden ? "摄像头预览已隐藏。" : "摄像头预览已准备。");
+}
+
+function updateCameraStatus(message) {
+  const cameraStatus = document.querySelector("#cameraStatus");
+
+  if (cameraStatus) {
+    cameraStatus.textContent = message;
   }
 }
 

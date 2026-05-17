@@ -67,6 +67,71 @@ body {
   background: rgba(58, 47, 32, 0.92);
 }
 
+.camera-panel {
+  width: min(100%, 1080px);
+  margin: 18px auto 0;
+}
+
+.camera-panel__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.camera-panel__button {
+  min-width: 112px;
+  padding: 9px 14px;
+  border: 1px solid rgba(126, 231, 255, 0.38);
+  border-radius: 6px;
+  color: #e8fbff;
+  background: rgba(22, 45, 52, 0.86);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.camera-panel__button:hover {
+  border-color: rgba(126, 231, 255, 0.7);
+  background: rgba(30, 61, 70, 0.92);
+}
+
+.camera-preview {
+  margin-top: 12px;
+}
+
+.camera-preview__frame {
+  position: relative;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(126, 231, 255, 0.2);
+  border-radius: 8px;
+  background: #111d20;
+}
+
+.camera-preview__video {
+  display: block;
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  background: #071013;
+}
+
+.camera-preview__status {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid rgba(126, 231, 255, 0.28);
+  border-radius: 4px;
+  color: #def8ff;
+  background: rgba(9, 24, 28, 0.82);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .mural-frame {
   position: relative;
   width: min(100%, 1080px);
