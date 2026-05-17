@@ -1,6 +1,7 @@
 let muralData = null;
 let objectData = [];
 let activeObjectIds = [];
+let cameraStream = null;
 const DEBUG_POLYGON = false;
 const DEBUG_ANCHOR = true;
 const MAX_ACTIVE_OBJECTS = 2;
@@ -380,20 +381,70 @@ function bindCameraModeButton() {
     return;
   }
 
-  cameraModeButton.addEventListener("click", function () {
-    toggleCameraPreview();
+  cameraModeButton.addEventListener("click", async function () {
+    await toggleCameraPreview();
   });
 }
 
-function toggleCameraPreview() {
+async function toggleCameraPreview() {
   const cameraPreviewPanel = document.querySelector("#cameraPreviewPanel");
 
   if (!cameraPreviewPanel) {
     return;
   }
 
-  cameraPreviewPanel.hidden = !cameraPreviewPanel.hidden;
-  updateCameraStatus(cameraPreviewPanel.hidden ? "摄像头预览已隐藏。" : "摄像头预览已准备。");
+  if (cameraPreviewPanel.hidden) {
+    cameraPreviewPanel.hidden = false;
+    await openCameraStream();
+    return;
+  }
+
+  stopCameraStream();
+  cameraPreviewPanel.hidden = true;
+  updateCameraStatus("摄像头预览已隐藏。");
+}
+
+async function openCameraStream() {
+  const cameraVideo = document.querySelector("#cameraVideo");
+
+  if (!cameraVideo) {
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    updateCameraStatus("当前浏览器不支持摄像头访问，请换用支持 getUserMedia 的浏览器。");
+    return;
+  }
+
+  try {
+    updateCameraStatus("正在请求摄像头权限...");
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "environment"
+      },
+      audio: false
+    });
+    cameraVideo.srcObject = cameraStream;
+    updateCameraStatus("摄像头已打开，请将画面对准目标壁画。");
+  } catch (error) {
+    console.error("Failed to open camera:", error);
+    updateCameraStatus("摄像头打开失败，请检查浏览器权限或摄像头是否被占用。");
+  }
+}
+
+function stopCameraStream() {
+  const cameraVideo = document.querySelector("#cameraVideo");
+
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(function (track) {
+      track.stop();
+    });
+    cameraStream = null;
+  }
+
+  if (cameraVideo) {
+    cameraVideo.srcObject = null;
+  }
 }
 
 function updateCameraStatus(message) {
