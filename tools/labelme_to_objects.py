@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
+SUPPORTED_SHAPE_TYPE = "polygon"
 USAGE_EXAMPLE = (
     "python tools/labelme_to_objects.py "
     "annotations/mural_001_labelme.json data/objects.json"
@@ -27,16 +28,29 @@ def load_labelme_json(input_path):
     image_width = labelme_data["imageWidth"]
     image_height = labelme_data["imageHeight"]
     shapes = labelme_data.get("shapes", [])
+    polygon_shapes = collect_polygon_shapes(shapes)
+
+    return image_width, image_height, polygon_shapes
+
+
+def collect_polygon_shapes(shapes):
     polygon_shapes = []
 
     for shape in shapes:
         shape_type = shape.get("shape_type")
-        points = shape.get("points")
+        label = shape.get("label", "")
+        points = shape.get("points", [])
 
-        if points and (shape_type == "polygon" or shape_type is None):
-            polygon_shapes.append(shape)
+        # LabelMe 旧文件可能没有 shape_type；这种情况按 polygon 处理。
+        if not points or (shape_type not in (SUPPORTED_SHAPE_TYPE, None)):
+            continue
 
-    return image_width, image_height, polygon_shapes
+        polygon_shapes.append({
+            "label": label,
+            "points": points
+        })
+
+    return polygon_shapes
 
 
 def normalize_point(point, image_width, image_height):
