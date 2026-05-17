@@ -3,7 +3,7 @@
 import cv2
 import numpy as np
 
-from app.config import (
+from .config import (
     CONFIDENCE_MATCH_TARGET,
     GOOD_MATCH_DISTANCE,
     MAX_REFERENCE_IMAGE_WIDTH,

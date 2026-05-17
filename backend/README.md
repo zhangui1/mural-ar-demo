@@ -29,10 +29,16 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8010
 ```
 
+如果你在项目根目录 `mural_ar_demo` 中启动，则使用：
+
+```powershell
+uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8010
+```
+
 启动后，后续阶段会通过下面地址访问识别接口：
 
 ```text
-http://localhost:8010
+http://127.0.0.1:8010
 ```
 
 `.venv` 是本地环境目录，不需要提交到 GitHub。

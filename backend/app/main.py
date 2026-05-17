@@ -1,7 +1,7 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
-from app.config import MURAL_ID
-from app.recognizer import MuralRecognizer, ReferenceImageError
+from .config import MURAL_ID
+from .recognizer import MuralRecognizer, ReferenceImageError
 
 
 app = FastAPI(title="Mural Recognition Backend")
