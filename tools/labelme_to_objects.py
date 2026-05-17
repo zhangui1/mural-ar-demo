@@ -4,11 +4,16 @@ from pathlib import Path
 
 
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
+USAGE_EXAMPLE = (
+    "python tools/labelme_to_objects.py "
+    "annotations/mural_001_labelme.json data/objects.json"
+)
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Convert LabelMe polygon annotations to mural demo objects.json."
+        description="Convert LabelMe polygon annotations to mural demo objects.json.",
+        epilog=f"Example: {USAGE_EXAMPLE}"
     )
     parser.add_argument("input_json", help="Path to LabelMe JSON file.")
     parser.add_argument("output_json", help="Path to output objects.json file.")
