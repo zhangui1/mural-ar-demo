@@ -28,6 +28,8 @@ async function loadDemoData() {
     muralData = await muralResponse.json();
     objectData = await objectsResponse.json();
     objectData = normalizeObjectData(objectData);
+    pruneActiveObjectIds();
+    updateNavigationState();
 
     console.log("Mural data loaded:", muralData);
     console.log("Object data loaded:", objectData);
@@ -48,6 +50,18 @@ function normalizeObjectData(objects) {
       return normalizeObjectItem(objectItem, index);
     })
     .filter(Boolean);
+}
+
+function getObjectCount() {
+  return objectData.length;
+}
+
+function pruneActiveObjectIds() {
+  activeObjectIds = activeObjectIds.filter(function (objectId) {
+    return objectData.some(function (objectItem) {
+      return objectItem.id === objectId;
+    });
+  });
 }
 
 function normalizeObjectItem(objectItem, index) {
@@ -309,14 +323,16 @@ function getCurrentNavigationIndex() {
 }
 
 function navigateObject(direction) {
-  if (objectData.length === 0) {
+  const objectCount = getObjectCount();
+
+  if (objectCount === 0) {
     return;
   }
 
   const currentIndex = getCurrentNavigationIndex();
   const nextIndex = currentIndex === -1
     ? 0
-    : (currentIndex + direction + objectData.length) % objectData.length;
+    : (currentIndex + direction + objectCount) % objectCount;
 
   showOnlyActiveObject(objectData[nextIndex].id);
 }
@@ -337,6 +353,22 @@ function bindObjectNavigationButtons() {
       event.stopPropagation();
       navigateObject(1);
     });
+  }
+
+  updateNavigationState();
+}
+
+function updateNavigationState() {
+  const previousButton = document.querySelector("#previousObjectButton");
+  const nextButton = document.querySelector("#nextObjectButton");
+  const hasObjects = getObjectCount() > 0;
+
+  if (previousButton) {
+    previousButton.disabled = !hasObjects;
+  }
+
+  if (nextButton) {
+    nextButton.disabled = !hasObjects;
   }
 }
 
