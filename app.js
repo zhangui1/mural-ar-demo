@@ -176,6 +176,12 @@ function setPolygonTransformOrigin(polygonElement, objectItem, overlayWidth, ove
 function bindPolygonActiveState(polygonElement, objectItem) {
   polygonElement.addEventListener("click", function (event) {
     event.stopPropagation();
+
+    if (activeObjectIds.length > 0) {
+      clearActiveObject();
+      return;
+    }
+
     setActiveObject(objectItem.id);
   });
 }
@@ -702,11 +708,17 @@ function hideObjectTooltip() {
 
 document.addEventListener("click", function (event) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
+  const infoCardLayer = document.querySelector("#infoCardLayer");
+
+  if (infoCardLayer && infoCardLayer.contains(event.target)) {
+    return;
+  }
 
   if (
     !polygonOverlay ||
     polygonOverlay.contains(event.target)
   ) {
+    clearActiveObject();
     return;
   }
 
