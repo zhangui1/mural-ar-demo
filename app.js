@@ -3,9 +3,11 @@ let objectData = [];
 let activeObjectIds = [];
 let cameraStream = null;
 let capturedFrameBlob = null;
+let latestRecognitionResult = null;
 const DEBUG_POLYGON = false;
 const DEBUG_ANCHOR = true;
 const MAX_ACTIVE_OBJECTS = 2;
+const RECOGNITION_API_URL = "http://127.0.0.1:8010/api/recognize";
 const DEFAULT_OBJECT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。";
 const DEFAULT_OBJECT_CATEGORY = "未分类";
 const DEFAULT_CARD_POSITION = [0.5, 0.16];
@@ -486,6 +488,7 @@ async function captureCameraFrame() {
   canvasContext.drawImage(cameraVideo, 0, 0, captureCanvas.width, captureCanvas.height);
   capturedFrameBlob = await canvasToBlob(captureCanvas);
   updateCameraStatus(`已截取当前帧，图片大小约 ${Math.round(capturedFrameBlob.size / 1024)} KB。`);
+  await sendCapturedFrameToRecognitionApi();
 }
 
 function canvasToBlob(canvas) {
@@ -501,6 +504,35 @@ function updateCaptureButtonState(enabled) {
 
   if (captureFrameButton) {
     captureFrameButton.disabled = !enabled;
+  }
+}
+
+async function sendCapturedFrameToRecognitionApi() {
+  if (!capturedFrameBlob) {
+    updateCameraStatus("请先截取当前帧，再进行识别。");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", capturedFrameBlob, "camera_frame.jpg");
+
+  try {
+    updateCameraStatus("正在上传当前帧到本地识别服务...");
+    const response = await fetch(RECOGNITION_API_URL, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`识别服务返回异常：${response.status}`);
+    }
+
+    latestRecognitionResult = await response.json();
+    updateCameraStatus("当前帧已完成识别。");
+  } catch (error) {
+    console.error("Failed to recognize camera frame:", error);
+    latestRecognitionResult = null;
+    updateCameraStatus("识别请求失败，请确认后端服务已在 127.0.0.1:8010 启动。");
   }
 }
 
