@@ -702,12 +702,10 @@ function hideObjectTooltip() {
 
 document.addEventListener("click", function (event) {
   const polygonOverlay = document.querySelector("#polygonOverlay");
-  const infoCardLayer = document.querySelector("#infoCardLayer");
 
   if (
     !polygonOverlay ||
-    polygonOverlay.contains(event.target) ||
-    (infoCardLayer && infoCardLayer.contains(event.target))
+    polygonOverlay.contains(event.target)
   ) {
     return;
   }
