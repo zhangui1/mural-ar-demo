@@ -4,6 +4,9 @@ let activeObjectIds = [];
 const DEBUG_POLYGON = false;
 const DEBUG_ANCHOR = true;
 const MAX_ACTIVE_OBJECTS = 2;
+const DEFAULT_OBJECT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。";
+const DEFAULT_OBJECT_CATEGORY = "未分类";
+const DEFAULT_CARD_POSITION = [0.5, 0.16];
 const MURAL_IMAGE_CANDIDATES = [
   "assets/murals/mural_001.jpg",
   "assets/murals/mural_001.png"
@@ -24,6 +27,7 @@ async function loadDemoData() {
 
     muralData = await muralResponse.json();
     objectData = await objectsResponse.json();
+    objectData = normalizeObjectData(objectData);
 
     console.log("Mural data loaded:", muralData);
     console.log("Object data loaded:", objectData);
@@ -32,6 +36,94 @@ async function loadDemoData() {
   } catch (error) {
     console.error("Failed to load demo data:", error);
   }
+}
+
+function normalizeObjectData(objects) {
+  if (!Array.isArray(objects)) {
+    return [];
+  }
+
+  return objects
+    .map(function (objectItem, index) {
+      return normalizeObjectItem(objectItem, index);
+    })
+    .filter(Boolean);
+}
+
+function normalizeObjectItem(objectItem, index) {
+  const rawObject = objectItem || {};
+  const polygon = normalizePolygon(rawObject.polygon);
+
+  if (polygon.length < 3) {
+    console.warn("Object skipped because polygon is invalid:", rawObject);
+    return null;
+  }
+
+  const anchor = normalizePoint(rawObject.anchor) || getPolygonCenter(polygon);
+  const cardPosition = normalizePoint(rawObject.cardPosition) || buildFallbackCardPosition(anchor);
+
+  return {
+    id: rawObject.id || `obj_${String(index + 1).padStart(3, "0")}`,
+    name: rawObject.name || `对象${index + 1}`,
+    category: rawObject.category || DEFAULT_OBJECT_CATEGORY,
+    polygon: polygon,
+    anchor: anchor,
+    cardPosition: cardPosition,
+    summary: rawObject.summary || DEFAULT_OBJECT_SUMMARY
+  };
+}
+
+function normalizePolygon(polygon) {
+  if (!Array.isArray(polygon)) {
+    return [];
+  }
+
+  return polygon
+    .map(normalizePoint)
+    .filter(Boolean);
+}
+
+function normalizePoint(point) {
+  if (!Array.isArray(point) || point.length < 2) {
+    return null;
+  }
+
+  const x = Number(point[0]);
+  const y = Number(point[1]);
+
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return null;
+  }
+
+  return [clamp(x, 0, 1), clamp(y, 0, 1)];
+}
+
+function getPolygonCenter(polygon) {
+  // 转换数据缺少 anchor 时，用 polygon 顶点平均值兜底。
+  const total = polygon.reduce(
+    function (result, point) {
+      result.x += point[0];
+      result.y += point[1];
+      return result;
+    },
+    { x: 0, y: 0 }
+  );
+
+  return [
+    total.x / polygon.length,
+    total.y / polygon.length
+  ];
+}
+
+function buildFallbackCardPosition(anchor) {
+  if (!anchor) {
+    return DEFAULT_CARD_POSITION;
+  }
+
+  return [
+    clamp(anchor[0] + 0.18, 0.08, 0.82),
+    clamp(anchor[1] - 0.08, 0.08, 0.82)
+  ];
 }
 
 function updateMuralTitle(mural) {
