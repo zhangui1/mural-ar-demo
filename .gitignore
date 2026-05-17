@@ -33,6 +33,17 @@ temp/
 *.tif
 *.tiff
 
+# Local/private mural data
+data/*.json
+annotations/*.json
+assets/murals/*.jpg
+assets/murals/*.jpeg
+assets/murals/*.png
+!data/.gitkeep
+!annotations/README.md
+!assets/murals/.gitkeep
+!assets/murals/README.md
+
 # Local config
 .env
 .env.*
