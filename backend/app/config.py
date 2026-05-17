@@ -12,6 +12,6 @@ CONFIDENCE_MATCH_TARGET = 90
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 PROJECT_DIR = BACKEND_DIR.parent
 REFERENCE_MURAL_CANDIDATES = [
-    PROJECT_DIR / "assets" / "murals" / "mural_001.jpg",
     PROJECT_DIR / "assets" / "murals" / "mural_001.png",
+    PROJECT_DIR / "assets" / "murals" / "mural_001.jpg",
 ]
