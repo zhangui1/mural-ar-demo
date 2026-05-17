@@ -145,9 +145,33 @@ V2 阶段使用 LabelMe 对壁画中的人物、建筑、器物等对象进行 p
 python tools/labelme_to_objects.py annotations/mural_001.json data/objects.json
 ```
 
-7. 启动本地服务，刷新页面检查 polygon、卡片和光束是否对齐。
+7. 校验转换后的对象数据：
+
+```powershell
+python tools/validate_objects.py data/objects.json
+```
+
+8. 启动本地服务，刷新页面检查 polygon、卡片和光束是否对齐。
 
 图片、标注 JSON、转换后的 `data/objects.json` 可以只作为本地数据使用。如果文件较大或只是本地测试数据，不需要提交到 GitHub。
+
+## objects.json 校验流程
+
+每次重新标注并转换后，建议先运行：
+
+```powershell
+python tools/validate_objects.py data/objects.json
+```
+
+校验工具会检查：
+
+- JSON 是否可以读取；
+- 每个对象是否包含 `id`、`name`、`category`、`polygon`、`anchor`、`cardPosition`、`summary`；
+- `polygon` 是否至少有 3 个点；
+- `polygon`、`anchor`、`cardPosition` 的坐标是否都在 0 到 1 之间；
+- `id` 是否重复。
+
+`data/objects.schema.json` 是可提交的结构规范；真实 `data/objects.json`、LabelMe 标注 JSON 和壁画图片只保留在本地，不提交到 GitHub。
 
 ## 常见问题
 
