@@ -49,10 +49,14 @@
         <button id="cameraModeButton" class="camera-panel__button" type="button">
           摄像头模式
         </button>
+        <button id="captureFrameButton" class="camera-panel__button" type="button" disabled>
+          截取当前帧
+        </button>
       </div>
       <div id="cameraPreviewPanel" class="camera-preview" hidden>
         <div class="camera-preview__frame">
           <video id="cameraVideo" class="camera-preview__video" autoplay muted playsinline></video>
+          <canvas id="cameraCaptureCanvas" class="camera-preview__canvas" hidden></canvas>
           <p id="cameraStatus" class="camera-preview__status">
             摄像头预览已准备。
           </p>

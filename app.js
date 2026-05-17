@@ -2,6 +2,7 @@ let muralData = null;
 let objectData = [];
 let activeObjectIds = [];
 let cameraStream = null;
+let capturedFrameBlob = null;
 const DEBUG_POLYGON = false;
 const DEBUG_ANCHOR = true;
 const MAX_ACTIVE_OBJECTS = 2;
@@ -18,6 +19,7 @@ async function initializeApp() {
   showMuralImageWhenAvailable();
   bindObjectNavigationButtons();
   bindCameraModeButton();
+  bindCaptureFrameButton();
   await loadDemoData();
 }
 
@@ -425,9 +427,11 @@ async function openCameraStream() {
       audio: false
     });
     cameraVideo.srcObject = cameraStream;
+    updateCaptureButtonState(true);
     updateCameraStatus("摄像头已打开，请将画面对准目标壁画。");
   } catch (error) {
     console.error("Failed to open camera:", error);
+    updateCaptureButtonState(false);
     updateCameraStatus("摄像头打开失败，请检查浏览器权限或摄像头是否被占用。");
   }
 }
@@ -444,6 +448,59 @@ function stopCameraStream() {
 
   if (cameraVideo) {
     cameraVideo.srcObject = null;
+  }
+
+  capturedFrameBlob = null;
+  updateCaptureButtonState(false);
+}
+
+function bindCaptureFrameButton() {
+  const captureFrameButton = document.querySelector("#captureFrameButton");
+
+  if (!captureFrameButton) {
+    return;
+  }
+
+  captureFrameButton.addEventListener("click", async function () {
+    await captureCameraFrame();
+  });
+}
+
+async function captureCameraFrame() {
+  const cameraVideo = document.querySelector("#cameraVideo");
+  const captureCanvas = document.querySelector("#cameraCaptureCanvas");
+
+  if (!cameraVideo || !captureCanvas || !cameraStream) {
+    updateCameraStatus("请先打开摄像头，再截取画面。");
+    return;
+  }
+
+  if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+    updateCameraStatus("摄像头画面尚未就绪，请稍后再试。");
+    return;
+  }
+
+  captureCanvas.width = cameraVideo.videoWidth;
+  captureCanvas.height = cameraVideo.videoHeight;
+  const canvasContext = captureCanvas.getContext("2d");
+  canvasContext.drawImage(cameraVideo, 0, 0, captureCanvas.width, captureCanvas.height);
+  capturedFrameBlob = await canvasToBlob(captureCanvas);
+  updateCameraStatus(`已截取当前帧，图片大小约 ${Math.round(capturedFrameBlob.size / 1024)} KB。`);
+}
+
+function canvasToBlob(canvas) {
+  return new Promise(function (resolve) {
+    canvas.toBlob(function (blob) {
+      resolve(blob);
+    }, "image/jpeg", 0.88);
+  });
+}
+
+function updateCaptureButtonState(enabled) {
+  const captureFrameButton = document.querySelector("#captureFrameButton");
+
+  if (captureFrameButton) {
+    captureFrameButton.disabled = !enabled;
   }
 }
 

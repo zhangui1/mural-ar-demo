@@ -75,6 +75,7 @@ body {
 .camera-panel__toolbar {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .camera-panel__button {
@@ -91,6 +92,13 @@ body {
 .camera-panel__button:hover {
   border-color: rgba(126, 231, 255, 0.7);
   background: rgba(30, 61, 70, 0.92);
+}
+
+.camera-panel__button:disabled {
+  color: rgba(232, 251, 255, 0.42);
+  border-color: rgba(126, 231, 255, 0.16);
+  background: rgba(22, 45, 52, 0.42);
+  cursor: not-allowed;
 }
 
 .camera-preview {
@@ -115,6 +123,10 @@ body {
   max-height: 480px;
   object-fit: contain;
   background: #071013;
+}
+
+.camera-preview__canvas {
+  display: none;
 }
 
 .camera-preview__status {
