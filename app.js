@@ -528,11 +528,53 @@ async function sendCapturedFrameToRecognitionApi() {
     }
 
     latestRecognitionResult = await response.json();
+    updateRecognitionResult(latestRecognitionResult);
     updateCameraStatus("当前帧已完成识别。");
   } catch (error) {
     console.error("Failed to recognize camera frame:", error);
     latestRecognitionResult = null;
+    clearRecognitionResult();
     updateCameraStatus("识别请求失败，请确认后端服务已在 127.0.0.1:8010 启动。");
+  }
+}
+
+function updateRecognitionResult(result) {
+  const resultPanel = document.querySelector("#recognitionResult");
+
+  if (!resultPanel || !result) {
+    return;
+  }
+
+  resultPanel.hidden = false;
+  setTextContent("#recognitionMatched", result.matched ? "识别成功" : "未识别");
+  setTextContent("#recognitionMuralId", result.mural_id || "-");
+  setTextContent("#recognitionConfidence", formatConfidence(result.confidence));
+  setTextContent("#recognitionGoodMatches", String(result.good_matches ?? "-"));
+}
+
+function clearRecognitionResult() {
+  const resultPanel = document.querySelector("#recognitionResult");
+
+  if (resultPanel) {
+    resultPanel.hidden = true;
+  }
+}
+
+function formatConfidence(confidence) {
+  const numericConfidence = Number(confidence);
+
+  if (!Number.isFinite(numericConfidence)) {
+    return "-";
+  }
+
+  return `${Math.round(numericConfidence * 100)}%`;
+}
+
+function setTextContent(selector, text) {
+  const element = document.querySelector(selector);
+
+  if (element) {
+    element.textContent = text;
   }
 }
 
