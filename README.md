@@ -99,6 +99,12 @@ mural_001.png
 
 替换图片后，原来的 polygon 坐标通常会错位。原因是 `data/objects.json` 里的 `polygon`、`anchor`、`cardPosition` 都是基于当前图片位置和尺寸标注的。换成新图后，应重新用 LabelMe 标注并重新生成 `objects.json`。
 
+## 如何标注壁画对象
+
+V2 阶段使用 LabelMe 对壁画中的人物、建筑、器物等对象进行 polygon 精细标注。完整标注说明见：
+
+[annotations/README.md](annotations/README.md)
+
 ## objects.json 字段说明
 
 `data/objects.json` 是页面加载的对象标注数据。每个对象包含：
