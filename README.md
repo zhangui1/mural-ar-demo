@@ -155,6 +155,33 @@ python tools/validate_objects.py data/objects.json
 
 图片、标注 JSON、转换后的 `data/objects.json` 可以只作为本地数据使用。如果文件较大或只是本地测试数据，不需要提交到 GitHub。
 
+## V2 完整标注到预览流程
+
+1. 准备壁画图片，放入 `assets/murals/`，并命名为 `mural_001.jpg` 或 `mural_001.png`。
+2. 使用 LabelMe 打开壁画图片，按 `对象名称|类别` 规则进行 polygon 标注。
+3. 保存 LabelMe JSON 到本地 `annotations/` 目录。
+4. 转换为前端读取的 `objects.json`：
+
+```powershell
+python tools/labelme_to_objects.py annotations/mural_001.json data/objects.json
+```
+
+5. 校验 `objects.json`：
+
+```powershell
+python tools/validate_objects.py data/objects.json
+```
+
+6. 启动 Web Demo：
+
+```powershell
+python -m http.server 8000
+```
+
+然后访问 `http://localhost:8000`，检查 polygon、高亮对象、卡片位置和光束是否与壁画内容对齐。
+
+真实壁画图片、LabelMe JSON、`data/objects.json` 都只保留在本地，不提交到 GitHub。
+
 ## objects.json 校验流程
 
 每次重新标注并转换后，建议先运行：
