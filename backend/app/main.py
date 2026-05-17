@@ -1,10 +1,20 @@
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from .config import MURAL_ID
 from .recognizer import MuralRecognizer, ReferenceImageError
 
 
 app = FastAPI(title="Mural Recognition Backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:8000",
+    ],
+    allow_credentials=False,
+    allow_methods=["POST", "GET", "OPTIONS"],
+    allow_headers=["*"],
+)
 recognizer = None
 
 
