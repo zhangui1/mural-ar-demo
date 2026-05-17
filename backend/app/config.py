@@ -4,6 +4,8 @@ from pathlib import Path
 
 
 MURAL_ID = "mural_001"
+ORB_FEATURE_COUNT = 2000
+MAX_REFERENCE_IMAGE_WIDTH = 1600
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 PROJECT_DIR = BACKEND_DIR.parent
 REFERENCE_MURAL_CANDIDATES = [
