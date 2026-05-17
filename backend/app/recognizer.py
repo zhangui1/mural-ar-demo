@@ -3,7 +3,10 @@
 import cv2
 
 from app.config import (
+    CONFIDENCE_MATCH_TARGET,
+    GOOD_MATCH_DISTANCE,
     MAX_REFERENCE_IMAGE_WIDTH,
+    MIN_GOOD_MATCHES,
     MURAL_ID,
     ORB_FEATURE_COUNT,
     REFERENCE_MURAL_CANDIDATES,
@@ -20,6 +23,7 @@ class MuralRecognizer:
     def __init__(self):
         self.mural_id = MURAL_ID
         self.orb = cv2.ORB_create(nfeatures=ORB_FEATURE_COUNT)
+        self.matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         self.reference_image_path = self._find_reference_image_path()
         self.reference_image = self._load_reference_image()
         self.reference_gray = self._prepare_image(self.reference_image)
@@ -60,3 +64,30 @@ class MuralRecognizer:
     def _extract_features(self, gray_image):
         keypoints, descriptors = self.orb.detectAndCompute(gray_image, None)
         return keypoints or [], descriptors
+
+    def recognize(self, frame_image):
+        frame_gray = self._prepare_image(frame_image)
+        frame_keypoints, frame_descriptors = self._extract_features(frame_gray)
+
+        if frame_descriptors is None or len(frame_keypoints) == 0:
+            return self._build_result(False, 0.0, 0)
+
+        matches = self.matcher.match(self.reference_descriptors, frame_descriptors)
+        good_matches = [
+            match
+            for match in matches
+            if match.distance <= GOOD_MATCH_DISTANCE
+        ]
+        good_match_count = len(good_matches)
+        confidence = min(good_match_count / CONFIDENCE_MATCH_TARGET, 1.0)
+        matched = good_match_count >= MIN_GOOD_MATCHES
+
+        return self._build_result(matched, confidence, good_match_count)
+
+    def _build_result(self, matched, confidence, good_matches):
+        return {
+            "matched": matched,
+            "mural_id": self.mural_id if matched else None,
+            "confidence": round(confidence, 2),
+            "good_matches": good_matches,
+        }
