@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mural AR Objects",
+  "description": "V2 标注转换后的前端对象数据结构。",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "name",
+      "category",
+      "polygon",
+      "anchor",
+      "cardPosition",
+      "summary"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "category": {
+        "type": "string",
+        "minLength": 1
+      },
+      "polygon": {
+        "type": "array",
+        "minItems": 3,
+        "items": {
+          "$ref": "#/$defs/point"
+        }
+      },
+      "anchor": {
+        "$ref": "#/$defs/point"
+      },
+      "cardPosition": {
+        "$ref": "#/$defs/point"
+      },
+      "summary": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    }
+  }
+}
