@@ -6,6 +6,10 @@ from pathlib import Path
 DEFAULT_SUMMARY = "该对象是壁画中的重要视觉元素，后续将补充更准确的文物说明。"
 DEFAULT_CATEGORY = "未分类"
 COORDINATE_PRECISION = 6
+CARD_OFFSET_X = 0.18
+CARD_OFFSET_Y = 0.08
+CARD_MAX_X = 0.82
+CARD_MIN_Y = 0.08
 SUPPORTED_SHAPE_TYPE = "polygon"
 USAGE_EXAMPLE = (
     "python tools/labelme_to_objects.py "
@@ -125,6 +129,7 @@ def convert_shapes_to_basic_objects(image_width, image_height, polygon_shapes):
 
 
 def build_anchor(polygon):
+    # 默认锚点取 polygon 顶点平均值，足够稳定，后续可在 objects.json 中手动微调。
     point_count = len(polygon)
     anchor_x = sum(point[0] for point in polygon) / point_count
     anchor_y = sum(point[1] for point in polygon) / point_count
@@ -132,8 +137,9 @@ def build_anchor(polygon):
 
 
 def build_card_position(anchor):
-    card_x = min(anchor[0] + 0.18, 0.82)
-    card_y = max(anchor[1] - 0.08, 0.08)
+    # 卡片默认放在锚点右上方，并限制在较安全的画面范围内。
+    card_x = min(anchor[0] + CARD_OFFSET_X, CARD_MAX_X)
+    card_y = max(anchor[1] - CARD_OFFSET_Y, CARD_MIN_Y)
     return [round(card_x, 6), round(card_y, 6)]
 
 
