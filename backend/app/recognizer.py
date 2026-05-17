@@ -1,6 +1,7 @@
 """V3 单张壁画识别逻辑。"""
 
 import cv2
+import numpy as np
 
 from app.config import (
     CONFIDENCE_MATCH_TARGET,
@@ -83,6 +84,15 @@ class MuralRecognizer:
         matched = good_match_count >= MIN_GOOD_MATCHES
 
         return self._build_result(matched, confidence, good_match_count)
+
+    def recognize_bytes(self, image_bytes):
+        image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+        frame_image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+        if frame_image is None:
+            raise ValueError("上传文件不是可读取的图片。")
+
+        return self.recognize(frame_image)
 
     def _build_result(self, matched, confidence, good_matches):
         return {
